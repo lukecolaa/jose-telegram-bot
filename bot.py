@@ -130,17 +130,21 @@ def extract_and_save_knowledge(user_message, assistant_message):
         extraction = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=512,
-            system="""You extract key knowledge from conversations. Given a message exchange, identify anything worth remembering for future conversations:
-- Decisions made
-- New ideas or plans
+            system="""You extract ALL knowledge from conversations to build a permanent memory. Save EVERYTHING worth remembering — business AND personal. Luke is building a relationship with Jose, so personal details matter just as much as business ones.
+
+Save things like:
+- What Luke is doing, eating, thinking about, excited about
+- Decisions made or preferences expressed
+- New ideas, plans, or strategies
 - Tasks assigned or completed
-- Important facts learned
+- Important facts about Luke's life, schedule, or mood
 - Problems identified or solved
 - Goals, deadlines, or milestones
+- People, places, or things Luke mentions
 
-If there's nothing worth saving (small talk, greetings, simple questions), respond with exactly: NONE
+ONLY respond with exactly NONE if the message is a single word greeting like "hi" or "hey" with zero content.
 
-Otherwise, respond with 1-3 bullet points of key knowledge. Be concise. Start each bullet with a category tag: [DECISION], [IDEA], [TASK], [FACT], [GOAL], or [SOLVED].""",
+Otherwise, respond with 1-3 bullet points. Be concise. Start each with a tag: [DECISION], [IDEA], [TASK], [FACT], [GOAL], [SOLVED], or [PERSONAL]. Nothing else — no explanations, no reasoning, just the bullet points.""",
             messages=[{
                 "role": "user",
                 "content": f"Luke said: {user_message}\n\nJose replied: {assistant_message}"
@@ -148,8 +152,12 @@ Otherwise, respond with 1-3 bullet points of key knowledge. Be concise. Start ea
         )
 
         extracted = extraction.content[0].text.strip()
-        if extracted == "NONE":
+        if "NONE" in extracted and len(extracted) < 20:
             return
+        lines = [l for l in extracted.split("\n") if l.strip().startswith("-") or l.strip().startswith("[")]
+        if not lines:
+            return
+        extracted = "\n".join(lines)
 
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         timestamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
