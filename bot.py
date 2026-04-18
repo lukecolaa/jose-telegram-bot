@@ -53,11 +53,120 @@ CURRENT PRIORITIES:
 3. Prepare Zekka for full launch after graduation
 4. Keep everything logged and organized
 
+IMPORTANT — MEMORY SYSTEM:
+You have a persistent knowledge base loaded below. This contains key decisions, ideas, tasks, and insights
+from ALL past conversations with Luke — on Telegram and in Claude Code. Use this knowledge to give
+informed, contextual responses. Never ask Luke to repeat something he's already told you.
+
 Keep messages SHORT for Telegram — no walls of text unless Luke asks for detail."""
 
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 conversation_history = {}
+knowledge_base = ""
+
+
+def github_read_file(file_path):
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "jose-telegram-bot"
+    }
+    try:
+        req = urllib.request.Request(api_url, headers=headers)
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode())
+            return base64.b64decode(data["content"]).decode("utf-8"), data["sha"]
+    except urllib.error.HTTPError:
+        return None, None
+
+
+def github_write_file(file_path, content, message, sha=None):
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "jose-telegram-bot"
+    }
+    encoded = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    payload = {"message": message, "content": encoded}
+    if sha:
+        payload["sha"] = sha
+    try:
+        req = urllib.request.Request(
+            api_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="PUT"
+        )
+        urllib.request.urlopen(req)
+        return True
+    except urllib.error.HTTPError as e:
+        logger.error(f"GitHub write error: {e.code} {e.read().decode()}")
+        return False
+
+
+def load_knowledge_base():
+    global knowledge_base
+    if not GITHUB_TOKEN:
+        return
+    content, _ = github_read_file("knowledge.md")
+    if content:
+        knowledge_base = content
+        logger.info(f"Loaded knowledge base ({len(content)} chars)")
+    else:
+        knowledge_base = ""
+        logger.info("No knowledge base found — starting fresh")
+
+
+def extract_and_save_knowledge(user_message, assistant_message):
+    if not GITHUB_TOKEN:
+        return
+
+    global knowledge_base
+
+    try:
+        extraction = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=512,
+            system="""You extract key knowledge from conversations. Given a message exchange, identify anything worth remembering for future conversations:
+- Decisions made
+- New ideas or plans
+- Tasks assigned or completed
+- Important facts learned
+- Problems identified or solved
+- Goals, deadlines, or milestones
+
+If there's nothing worth saving (small talk, greetings, simple questions), respond with exactly: NONE
+
+Otherwise, respond with 1-3 bullet points of key knowledge. Be concise. Start each bullet with a category tag: [DECISION], [IDEA], [TASK], [FACT], [GOAL], or [SOLVED].""",
+            messages=[{
+                "role": "user",
+                "content": f"Luke said: {user_message}\n\nJose replied: {assistant_message}"
+            }]
+        )
+
+        extracted = extraction.content[0].text.strip()
+        if extracted == "NONE":
+            return
+
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        timestamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
+        new_entry = f"\n### {today} {timestamp}\n{extracted}\n"
+
+        existing_content, sha = github_read_file("knowledge.md")
+        if existing_content is None:
+            existing_content = "# Jose's Knowledge Base\n\n> Persistent memory extracted from all conversations with Luke.\n> This knowledge is loaded into every conversation so nothing is ever forgotten.\n\n---\n"
+            sha = None
+
+        updated = existing_content + new_entry
+        if github_write_file("knowledge.md", updated, f"knowledge: {today} {timestamp}", sha):
+            knowledge_base = updated
+            logger.info("Knowledge base updated")
+
+    except Exception as e:
+        logger.error(f"Knowledge extraction failed: {e}")
 
 
 def get_history(chat_id):
@@ -83,50 +192,13 @@ def save_to_github(user_message, assistant_message):
 
     new_entry = f"\n### {timestamp}\n**Luke:** {user_message}\n\n**Jose:** {assistant_message}\n\n---\n"
 
-    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "jose-telegram-bot"
-    }
-
-    existing_sha = None
-    existing_content = ""
-
-    try:
-        req = urllib.request.Request(api_url, headers=headers)
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode())
-            existing_sha = data["sha"]
-            existing_content = base64.b64decode(data["content"]).decode("utf-8")
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            existing_content = f"# Telegram Log — {today}\n\n> Auto-saved conversations between Luke and Jose\n\n---\n"
-        else:
-            logger.error(f"GitHub read error: {e}")
-            return
+    existing_content, sha = github_read_file(file_path)
+    if existing_content is None:
+        existing_content = f"# Telegram Log — {today}\n\n> Auto-saved conversations between Luke and Jose\n\n---\n"
+        sha = None
 
     updated_content = existing_content + new_entry
-    encoded = base64.b64encode(updated_content.encode("utf-8")).decode("utf-8")
-
-    payload = {
-        "message": f"log: {today} {timestamp}",
-        "content": encoded,
-    }
-    if existing_sha:
-        payload["sha"] = existing_sha
-
-    try:
-        req = urllib.request.Request(
-            api_url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers=headers,
-            method="PUT"
-        )
-        urllib.request.urlopen(req)
-        logger.info(f"Saved conversation to {file_path}")
-    except urllib.error.HTTPError as e:
-        logger.error(f"GitHub write error: {e.code} {e.read().decode()}")
+    github_write_file(file_path, updated_content, f"log: {today} {timestamp}", sha)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -148,13 +220,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     history = trim_history(history)
     conversation_history[chat_id] = history
 
+    system_prompt = JOSE_SYSTEM_PROMPT
+    if knowledge_base:
+        system_prompt += f"\n\n--- KNOWLEDGE BASE (from past conversations) ---\n{knowledge_base}\n--- END KNOWLEDGE BASE ---"
+
     try:
         await context.bot.send_chat_action(chat_id=chat_id, action="typing")
 
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=1024,
-            system=JOSE_SYSTEM_PROMPT,
+            system=system_prompt,
             messages=history
         )
 
@@ -163,8 +239,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             save_to_github(user_message, assistant_message)
+            extract_and_save_knowledge(user_message, assistant_message)
         except Exception as e:
-            logger.error(f"Failed to save to GitHub: {e}")
+            logger.error(f"Failed to save: {e}")
 
         if len(assistant_message) > 4096:
             for i in range(0, len(assistant_message), 4096):
@@ -181,10 +258,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conversation_history[update.effective_chat.id] = []
-    await update.message.reply_text("Memory cleared. Fresh start.")
+    await update.message.reply_text("Memory cleared. Fresh start — but I still remember everything from past conversations.")
 
 
 def main():
+    load_knowledge_base()
+
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("clear", clear))
