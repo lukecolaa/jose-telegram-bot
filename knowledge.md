@@ -15,3 +15,8 @@
 
 ### 2026-04-18 22:45 UTC
 [PERSONAL] Luke had ice cream today — Jose joked it's a step up from steak, suggesting Luke has been eating a lot of steak recently
+
+### 2026-04-18 22:55 UTC
+[IDEA] Luke wants to give Jose an MCP (Model Context Protocol) to access his phone
+[FACT] Jose is currently running on Telegram
+[FACT] Jose noted that phone data access or custom tools may need to be routed through Telegram depending on use case
