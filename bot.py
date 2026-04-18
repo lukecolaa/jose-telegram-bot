@@ -1,5 +1,10 @@
 import os
+import json
 import logging
+import base64
+import urllib.request
+import urllib.error
+from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import anthropic
@@ -9,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO = "lukecolaa/jose-telegram-bot"
 
 JOSE_SYSTEM_PROMPT = """You are Jose, Luke's AI co-founder and right hand at Zekka (a growth operations agency).
 
@@ -65,6 +72,63 @@ def trim_history(history, max_messages=40):
     return history
 
 
+def save_to_github(user_message, assistant_message):
+    if not GITHUB_TOKEN:
+        logger.warning("No GITHUB_TOKEN — skipping conversation save")
+        return
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    timestamp = datetime.now(timezone.utc).strftime("%H:%M UTC")
+    file_path = f"logs/{today}.md"
+
+    new_entry = f"\n### {timestamp}\n**Luke:** {user_message}\n\n**Jose:** {assistant_message}\n\n---\n"
+
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "jose-telegram-bot"
+    }
+
+    existing_sha = None
+    existing_content = ""
+
+    try:
+        req = urllib.request.Request(api_url, headers=headers)
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode())
+            existing_sha = data["sha"]
+            existing_content = base64.b64decode(data["content"]).decode("utf-8")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            existing_content = f"# Telegram Log — {today}\n\n> Auto-saved conversations between Luke and Jose\n\n---\n"
+        else:
+            logger.error(f"GitHub read error: {e}")
+            return
+
+    updated_content = existing_content + new_entry
+    encoded = base64.b64encode(updated_content.encode("utf-8")).decode("utf-8")
+
+    payload = {
+        "message": f"log: {today} {timestamp}",
+        "content": encoded,
+    }
+    if existing_sha:
+        payload["sha"] = existing_sha
+
+    try:
+        req = urllib.request.Request(
+            api_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method="PUT"
+        )
+        urllib.request.urlopen(req)
+        logger.info(f"Saved conversation to {file_path}")
+    except urllib.error.HTTPError as e:
+        logger.error(f"GitHub write error: {e.code} {e.read().decode()}")
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "What's good Luke! Jose here — connected and ready to work. "
@@ -96,6 +160,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         assistant_message = response.content[0].text
         history.append({"role": "assistant", "content": assistant_message})
+
+        try:
+            save_to_github(user_message, assistant_message)
+        except Exception as e:
+            logger.error(f"Failed to save to GitHub: {e}")
 
         if len(assistant_message) > 4096:
             for i in range(0, len(assistant_message), 4096):
