@@ -24,3 +24,10 @@
 ### 2026-04-18 22:55 UTC
 [IDEA] Luke interested in phone control/automation capabilities — Jose clarified limitations and offered alternative approach through existing APIs and integrations
 [TASK] Jose needs Luke to specify actual workflow/automation goal to design appropriate solution instead of direct phone control
+
+### 2026-04-18 22:56 UTC
+[GOAL] Make top 10 setters by June for Bali trip — this unlocks momentum and client relationships for summer
+[GOAL] Secure income by August to fund living in San Diego (setter job + Zekka revenue)
+[TASK] Get GHL automation running this week to replace manual outreach — Jose handling setup
+[IDEA] Optimize outreach messaging for higher response rate before scaling volume
+[FACT] Currently at 20% commission with 70% closer rate; volume is the bottleneck, not conversion quality
