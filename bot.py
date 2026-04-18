@@ -247,9 +247,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             save_to_github(user_message, assistant_message)
+        except Exception as e:
+            logger.error(f"Failed to save log: {e}")
+
+        try:
             extract_and_save_knowledge(user_message, assistant_message)
         except Exception as e:
-            logger.error(f"Failed to save: {e}")
+            logger.error(f"Failed to extract knowledge: {e}")
 
         if len(assistant_message) > 4096:
             for i in range(0, len(assistant_message), 4096):
