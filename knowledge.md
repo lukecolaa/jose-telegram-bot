@@ -68,3 +68,9 @@
 [FACT] Luke has 1.8K followers and is thinking about how to leverage them for business outreach
 [IDEA] Real credibility with diesel shop owners comes from understanding their pain points, confidence, direct communication, and proven results — not follower count alone
 [TASK] Luke needs to decide on a lead channel strategy (LinkedIn, maps farming, or other) for reaching diesel shop owners
+
+### 2026-04-19 00:10 UTC
+[DECISION] Luke questioned the relevance of Instagram followers to his business goals — Jose affirmed it's not directly useful for reaching diesel shop owners
+[IDEA] LinkedIn profile + verified status with proof of work (posts about diesel offers/results) builds trust with fleet owners/shop managers better than Instagram followers
+[IDEA] Personal referrals from past clients and personality-driven outreach matter more than follower counts for B2B diesel shop owner outreach
+[GOAL] Luke needs to identify the actual channels where diesel shop owners hang out — considering LinkedIn DMs, Google Maps/local search, Facebook groups, or referral-based deals as primary outreach channels
