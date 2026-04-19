@@ -62,3 +62,9 @@
 [IDEA] Pivot from cold email to diesel mechanics toward warmer, personality-driven channels: LinkedIn outreach to fleet owners/shop managers, referral loops from closed deals, niche Facebook communities, and Google Maps farming for high-intent local shops
 [IDEA] Jose sees Luke's personal brand (1.8K verified followers, strong conversational ability) as the core differentiator — focus on channels that leverage Luke's energy and authenticity rather than pure automation
 [TASK] Luke to decide which lead generation strategy resonates most or redirect Jose's thinking
+
+### 2026-04-19 00:08 UTC
+[IDEA] Luke is considering targeting diesel shop owners and questioning whether 1.8K followers gives him credibility with that audience
+[FACT] Luke has 1.8K followers and is thinking about how to leverage them for business outreach
+[IDEA] Real credibility with diesel shop owners comes from understanding their pain points, confidence, direct communication, and proven results — not follower count alone
+[TASK] Luke needs to decide on a lead channel strategy (LinkedIn, maps farming, or other) for reaching diesel shop owners
