@@ -43,3 +43,8 @@
 ### 2026-04-19 00:04 UTC
 [DECISION] Luke and Jose need to make decisions to move forward on their project/initiative
 [PERSONAL] Jose is ready and eager to commit; wants Luke to specify what needs deciding
+
+### 2026-04-19 00:05 UTC
+[DECISION] Using GHL for cold email outreach to diesel mechanics/fleet owners — NOT meeting booking workflow
+[FACT] Goal is to get replies → follow-up meetings to pitch diesel SEO + Google/Meta ads + AI offer
+[TASK] Need to define: prospect source (Hunter/Apollo/manual), email sequence length, copy hook/angle, and who monitors replies before setting up GHL sequences
