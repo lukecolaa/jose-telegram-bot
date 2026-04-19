@@ -97,3 +97,9 @@
 [IDEA] Referral loops from closed deals — ask each new client "who else in your network runs a diesel shop?" for warm intros; converts higher than cold outreach
 [IDEA] Direct calls to diesel shop owners — old school but preferred by decision-makers; needs rejection tolerance but high conversion if hook is solid
 [IDEA] LinkedIn + referrals + selective calls likely most effective than volume plays; quality leads where Luke's personality and understanding matter more
+
+### 2026-04-19 16:13 UTC
+[PROBLEM] Calling gatekeepers at diesel shops is ineffective — they block sales calls and kill momentum; need direct access to business owners instead
+[IDEA] Five gatekeeper-bypass channels: LinkedIn DMs, Facebook Groups (diesel/fleet communities), Google Maps (for listed personal numbers), referrals from closed deals, Instagram DMs
+[IDEA] Two-channel scaling strategy: build LinkedIn presence (posts + DMs) + generate referrals from first closes simultaneously, or focus purely on referral loops until social proof exists
+[DECISION] Luke needs to choose between dual approach (LinkedIn + referrals) vs. referral-only strategy until establishing credibility
