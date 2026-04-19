@@ -74,3 +74,9 @@
 [IDEA] LinkedIn profile + verified status with proof of work (posts about diesel offers/results) builds trust with fleet owners/shop managers better than Instagram followers
 [IDEA] Personal referrals from past clients and personality-driven outreach matter more than follower counts for B2B diesel shop owner outreach
 [GOAL] Luke needs to identify the actual channels where diesel shop owners hang out — considering LinkedIn DMs, Google Maps/local search, Facebook groups, or referral-based deals as primary outreach channels
+
+### 2026-04-19 00:10 UTC
+[DECISION] Luke is focusing on LinkedIn as the primary platform to reach diesel shop owners — this is where the target audience actually is
+[IDEA] LinkedIn strategy: (1) Clean up profile with Zekka work, keep professional but personable; (2) Post insights on diesel shop pain points/market wins as proof of work; (3) Personalized DMs to fleet owners/shop managers with specific problem angle
+[FACT] LinkedIn follower count doesn't matter — relevance and direct outreach do
+[TASK] Luke needs to decide: build a posting schedule first to warm up prospects, OR go straight to cold DMs to shop owners with a strong hook/angle that gets replies
