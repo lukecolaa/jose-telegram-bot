@@ -90,3 +90,10 @@
 [IDEA] Jose suggests LinkedIn DMs, warm referrals, and direct calls as higher-converting channels for this audience; Luke's intuition aligns with this
 [IDEA] Diesel shop owners respond to relevance and respect for time over volume blasts — positioning matters more than frequency
 [TASK] Jose offered to help build a LinkedIn strategy with research + personalized angles + proof of work posts if Luke wants to pursue that channel
+
+### 2026-04-19 16:10 UTC
+[IDEA] Google Maps farming — target high-intent local diesel shops by region, pull their info, reach via direct call/email with specific pain points
+[IDEA] Facebook groups — diesel mechanic communities, fleet owner groups, truck forums for more genuine conversations; participate naturally then DM strong prospects
+[IDEA] Referral loops from closed deals — ask each new client "who else in your network runs a diesel shop?" for warm intros; converts higher than cold outreach
+[IDEA] Direct calls to diesel shop owners — old school but preferred by decision-makers; needs rejection tolerance but high conversion if hook is solid
+[IDEA] LinkedIn + referrals + selective calls likely most effective than volume plays; quality leads where Luke's personality and understanding matter more
