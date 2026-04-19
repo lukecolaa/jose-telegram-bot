@@ -84,3 +84,9 @@
 ### 2026-04-19 16:08 UTC
 [DECISION] GHL outreach plan to diesel mechanics was scrapped (cold email approach didn't work)
 [IDEA] Luke considering revisiting the outreach strategy — exploring new angle/approach
+
+### 2026-04-19 16:09 UTC
+[DECISION] Luke is skeptical of SMS blasts and voicemail drops for diesel shop outreach — recognizes they get deleted/ignored without engagement
+[IDEA] Jose suggests LinkedIn DMs, warm referrals, and direct calls as higher-converting channels for this audience; Luke's intuition aligns with this
+[IDEA] Diesel shop owners respond to relevance and respect for time over volume blasts — positioning matters more than frequency
+[TASK] Jose offered to help build a LinkedIn strategy with research + personalized angles + proof of work posts if Luke wants to pursue that channel
