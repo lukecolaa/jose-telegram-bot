@@ -48,3 +48,6 @@
 [DECISION] Using GHL for cold email outreach to diesel mechanics/fleet owners — NOT meeting booking workflow
 [FACT] Goal is to get replies → follow-up meetings to pitch diesel SEO + Google/Meta ads + AI offer
 [TASK] Need to define: prospect source (Hunter/Apollo/manual), email sequence length, copy hook/angle, and who monitors replies before setting up GHL sequences
+
+### 2026-04-19 00:06 UTC
+[DECISION] Luke is scrapping an idea but hasn't specified which one yet — waiting on clarification between GHL cold email outreach to diesel mechanics or something else
