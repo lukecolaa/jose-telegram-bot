@@ -39,3 +39,7 @@
 ### 2026-04-19 00:03 UTC
 [PERSONAL] Luke wants to get açaí — considering it an upgrade from his current drink choice
 [TASK] GHL automation launch is the priority for this week — Jose is pushing for a timeline
+
+### 2026-04-19 00:04 UTC
+[DECISION] Luke and Jose need to make decisions to move forward on their project/initiative
+[PERSONAL] Jose is ready and eager to commit; wants Luke to specify what needs deciding
