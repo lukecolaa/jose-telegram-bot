@@ -56,3 +56,9 @@
 [DECISION] Scrapping GHL cold email sequence to diesel mechanics
 [GOAL] Hit top 10 by June for Bali trip (20% commission, 70% closer rate on diesel offer)
 [TASK] Find alternative lead source strategy — need volume of qualified diesel mechanic leads without automated emails
+
+### 2026-04-19 00:07 UTC
+[GOAL] Luke wants to hit top 10 by June — currently bottlenecked on lead volume despite strong 20% commission and 70% closer rate
+[IDEA] Pivot from cold email to diesel mechanics toward warmer, personality-driven channels: LinkedIn outreach to fleet owners/shop managers, referral loops from closed deals, niche Facebook communities, and Google Maps farming for high-intent local shops
+[IDEA] Jose sees Luke's personal brand (1.8K verified followers, strong conversational ability) as the core differentiator — focus on channels that leverage Luke's energy and authenticity rather than pure automation
+[TASK] Luke to decide which lead generation strategy resonates most or redirect Jose's thinking
