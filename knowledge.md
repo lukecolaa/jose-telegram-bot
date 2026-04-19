@@ -108,3 +108,8 @@
 [DECISION] Luke is open to any channel that reaches decision makers — prioritizing effectiveness over channel preference
 [IDEA] Three-channel decision-maker system: (1) Google Maps + direct calls to owner-run diesel shops, (2) Facebook Groups in diesel/fleet communities with value-first DMs, (3) LinkedIn cold DMs with shop-specific insights
 [TASK] Test one channel for 3 days with tracked messaging and conversion metrics before scaling
+
+### 2026-04-19 16:15 UTC
+[IDEA] Luke wants to build sub-agents under Jose for prospect research to enable delegation and scaling
+[DECISION] Luke is thinking about structuring agents before hitting a growth wall, but needs to clarify the research scope first (what data, what output format, what specific bottleneck)
+[GOAL] Luke's timeline includes testing 3 channels simultaneously and hitting top 10 by June — research leverage could free him to focus 100% on closing
