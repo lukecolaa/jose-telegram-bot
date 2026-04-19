@@ -103,3 +103,8 @@
 [IDEA] Five gatekeeper-bypass channels: LinkedIn DMs, Facebook Groups (diesel/fleet communities), Google Maps (for listed personal numbers), referrals from closed deals, Instagram DMs
 [IDEA] Two-channel scaling strategy: build LinkedIn presence (posts + DMs) + generate referrals from first closes simultaneously, or focus purely on referral loops until social proof exists
 [DECISION] Luke needs to choose between dual approach (LinkedIn + referrals) vs. referral-only strategy until establishing credibility
+
+### 2026-04-19 16:14 UTC
+[DECISION] Luke is open to any channel that reaches decision makers — prioritizing effectiveness over channel preference
+[IDEA] Three-channel decision-maker system: (1) Google Maps + direct calls to owner-run diesel shops, (2) Facebook Groups in diesel/fleet communities with value-first DMs, (3) LinkedIn cold DMs with shop-specific insights
+[TASK] Test one channel for 3 days with tracked messaging and conversion metrics before scaling
