@@ -51,3 +51,8 @@
 
 ### 2026-04-19 00:06 UTC
 [DECISION] Luke is scrapping an idea but hasn't specified which one yet — waiting on clarification between GHL cold email outreach to diesel mechanics or something else
+
+### 2026-04-19 00:06 UTC
+[DECISION] Scrapping GHL cold email sequence to diesel mechanics
+[GOAL] Hit top 10 by June for Bali trip (20% commission, 70% closer rate on diesel offer)
+[TASK] Find alternative lead source strategy — need volume of qualified diesel mechanic leads without automated emails
