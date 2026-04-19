@@ -80,3 +80,7 @@
 [IDEA] LinkedIn strategy: (1) Clean up profile with Zekka work, keep professional but personable; (2) Post insights on diesel shop pain points/market wins as proof of work; (3) Personalized DMs to fleet owners/shop managers with specific problem angle
 [FACT] LinkedIn follower count doesn't matter — relevance and direct outreach do
 [TASK] Luke needs to decide: build a posting schedule first to warm up prospects, OR go straight to cold DMs to shop owners with a strong hook/angle that gets replies
+
+### 2026-04-19 16:08 UTC
+[DECISION] GHL outreach plan to diesel mechanics was scrapped (cold email approach didn't work)
+[IDEA] Luke considering revisiting the outreach strategy — exploring new angle/approach
