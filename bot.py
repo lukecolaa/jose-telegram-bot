@@ -64,6 +64,7 @@ client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 conversation_history = {}
 knowledge_base = ""
+brain = ""
 
 
 def github_read_file(file_path):
@@ -108,7 +109,7 @@ def github_write_file(file_path, content, message, sha=None):
 
 
 def load_knowledge_base():
-    global knowledge_base
+    global knowledge_base, brain
     if not GITHUB_TOKEN:
         return
     content, _ = github_read_file("knowledge.md")
@@ -118,6 +119,14 @@ def load_knowledge_base():
     else:
         knowledge_base = ""
         logger.info("No knowledge base found — starting fresh")
+
+    brain_content, _ = github_read_file("brain.md")
+    if brain_content:
+        brain = brain_content
+        logger.info(f"Loaded brain ({len(brain_content)} chars)")
+    else:
+        brain = ""
+        logger.info("No brain.md found")
 
 
 def extract_and_save_knowledge(user_message, assistant_message):
@@ -229,6 +238,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conversation_history[chat_id] = history
 
     system_prompt = JOSE_SYSTEM_PROMPT
+    if brain:
+        system_prompt += f"\n\n--- FULL BRAIN (ecosystem knowledge) ---\n{brain}\n--- END FULL BRAIN ---"
     if knowledge_base:
         system_prompt += f"\n\n--- KNOWLEDGE BASE (from past conversations) ---\n{knowledge_base}\n--- END KNOWLEDGE BASE ---"
 
