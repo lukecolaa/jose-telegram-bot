@@ -137,3 +137,9 @@
 [GOAL] Luke targeting 50-60 days (late June/early July) for Zekka revenue flowing — dealership case study done + first paid clients closed
 [DECISION] Need clarification: is 50-60 days until physical departure for USD in August, or until Zekka revenue milestone? Timeline determines priority between setter job vs. Zekka case studies
 [FACT] Bali trip must happen by mid-June; USD (San Diego) starts in August — creates constraint on when Zekka can be prioritized
+
+### 2026-04-26 02:00 UTC
+[DECISION] Ad spend set at $50-60 for Buick dealership test with focus on precision over volume
+[DECISION] Trip changed from Bali to Cancun, mid-June timing for top 10 setters celebration
+[GOAL] Hit top 10 setters by mid-June, then lock in Zekka revenue July-early August before USD move
+[IDEA] Google Shopping (Buicks with inventory images) or Meta carousel ads for local intent conversion focus
