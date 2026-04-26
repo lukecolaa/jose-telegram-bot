@@ -125,3 +125,10 @@
 [FACT] Luke's dad likely has budget allocated and flexibility for marketing experiments at the dealership
 [IDEA] Luke is considering using Colandrea's slow-moving Buick inventory as a real case study/proof of concept for Zekka — testing ad strategies, generating results, and building a portfolio client simultaneously
 [GOAL] Luke wants to clarify exact boundaries of what can be done (channels, messaging, spend limits) before moving forward with dealership marketing experiments
+
+### 2026-04-26 01:59 UTC
+[DECISION] Luke's dad (Rick) will cover ad spend for dealership inventory test — green light to move forward
+[GOAL] Use dealership as real case study with before/after results for Zekka pitch deck to investors
+[FACT] Slow Buicks are the inventory Luke knows best and wants to test with
+[TASK] Clarify with Rick: budget size, channel preferences (Google/Meta/local SEO), timeline urgency, ad account ownership, corporate messaging constraints
+[IDEA] Furniture store → car dealership → diesel mechanics is Luke's planned client progression to build credibility
