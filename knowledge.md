@@ -113,3 +113,9 @@
 [IDEA] Luke wants to build sub-agents under Jose for prospect research to enable delegation and scaling
 [DECISION] Luke is thinking about structuring agents before hitting a growth wall, but needs to clarify the research scope first (what data, what output format, what specific bottleneck)
 [GOAL] Luke's timeline includes testing 3 channels simultaneously and hitting top 10 by June — research leverage could free him to focus 100% on closing
+
+### 2026-04-26 01:58 UTC
+[DECISION] Luke wants to run a marketing campaign for slow-selling Buicks at Colandrea Buick GMA
+[FACT] Colandrea Buick is a franchise — corporate (Buick) controls all marketing strategy and messaging; independent campaigns violate franchise agreements
+[FACT] Unauthorized marketing could result in corporate shutting down the campaign, dealership license risk, and liability for Luke's parents
+[IDEA] Proper approach: talk to Rick (Luke's dad) about getting corporate approval first, or position Zekka as external agency pitching services to the dealership as a client after proving results with other clients
