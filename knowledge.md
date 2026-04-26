@@ -132,3 +132,8 @@
 [FACT] Slow Buicks are the inventory Luke knows best and wants to test with
 [TASK] Clarify with Rick: budget size, channel preferences (Google/Meta/local SEO), timeline urgency, ad account ownership, corporate messaging constraints
 [IDEA] Furniture store → car dealership → diesel mechanics is Luke's planned client progression to build credibility
+
+### 2026-04-26 02:00 UTC
+[GOAL] Luke targeting 50-60 days (late June/early July) for Zekka revenue flowing — dealership case study done + first paid clients closed
+[DECISION] Need clarification: is 50-60 days until physical departure for USD in August, or until Zekka revenue milestone? Timeline determines priority between setter job vs. Zekka case studies
+[FACT] Bali trip must happen by mid-June; USD (San Diego) starts in August — creates constraint on when Zekka can be prioritized
