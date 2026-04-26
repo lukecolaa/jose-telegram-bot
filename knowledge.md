@@ -119,3 +119,9 @@
 [FACT] Colandrea Buick is a franchise — corporate (Buick) controls all marketing strategy and messaging; independent campaigns violate franchise agreements
 [FACT] Unauthorized marketing could result in corporate shutting down the campaign, dealership license risk, and liability for Luke's parents
 [IDEA] Proper approach: talk to Rick (Luke's dad) about getting corporate approval first, or position Zekka as external agency pitching services to the dealership as a client after proving results with other clients
+
+### 2026-04-26 01:59 UTC
+[FACT] Luke discovered marketing decisions are NOT controlled by corporate — dealers/franchises have autonomy over their own marketing
+[FACT] Luke's dad likely has budget allocated and flexibility for marketing experiments at the dealership
+[IDEA] Luke is considering using Colandrea's slow-moving Buick inventory as a real case study/proof of concept for Zekka — testing ad strategies, generating results, and building a portfolio client simultaneously
+[GOAL] Luke wants to clarify exact boundaries of what can be done (channels, messaging, spend limits) before moving forward with dealership marketing experiments
