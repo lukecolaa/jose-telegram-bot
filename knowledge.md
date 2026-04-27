@@ -175,3 +175,6 @@
 [FACT] Luke owes money and parents are concerned about an 18-year-old making impulsive decisions (job drop + Mexico trip + mentores group)
 [TASK] Luke needs to gather concrete details about the mentores trip: real names/backgrounds of organizers, accommodation specifics, daily schedule, budget breakdown, check-in protocol, travel insurance/emergency plan — to present a professional plan to parents
 [IDEA] Reframe trip to parents as a business/networking opportunity for Zekka growth with established mentors, not an adventure; position it like a business trip
+
+### 2026-04-27 10:56 UTC
+[FACT] Three people Luke mentioned: Alan Caro, Luke Smital, and Chris Campos — context needed on their roles/relevance to current projects
