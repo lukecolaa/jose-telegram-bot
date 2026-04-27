@@ -192,3 +192,12 @@
 [TASK] Frame trip as business opportunity for Zekka — document who he's meeting, entrepreneur connections being made, link to summer revenue goals
 [TASK] Purchase travel insurance ($15-30) before pitching to parents again
 [DECISION] Need all documentation ready BEFORE re-pitching to parents, not after — legitimacy on paper is the barrier
+
+### 2026-04-27 12:20 UTC
+[PERSONAL] Luke's parents think the Cancun trip is a scam — legitimate concern about 18-year-old going abroad with people they don't know
+[TASK] Get Alan/Luke/Chris to contact Luke's parents directly with background, itinerary, and accommodation details
+[TASK] Obtain Airbnb listing screenshot with address, photos, and reviews
+[TASK] Get Alan's LinkedIn and business registration info for parent verification
+[TASK] Purchase travel insurance ($25-40) and show parents the policy
+[TASK] Create one-pager for parents with: attendees + photos/LinkedIn, Airbnb address, trip dates, business purpose (Zekka networking), daily check-in commitment, cost breakdown
+[GOAL] Present parents with complete, verifiable information to shift decision from fear-based to informed
