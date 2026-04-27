@@ -217,3 +217,11 @@
 [IDEA] Lead with Zekka business case: show dealership ad campaign numbers, setter commission structure (20% per close), concrete $6-8K revenue target by August
 [IDEA] Delay Cancun pitch 2-3 days; gather full trip documentation (Alan's LinkedIn, Airbnb proof, itinerary, insurance) then present as professional one-pager
 [TASK] Get Cancun trip docs before re-approaching family
+
+### 2026-04-27 12:47 UTC
+[FACT] Luke works summer job 9-11am, trains with Martin 11-1pm
+[FACT] Martin's training contract requires 6 weeks with no trips
+[FACT] Luke has a World Cup family trip mid-summer (~1 week) that conflicts with Martin's no-trips requirement
+[DECISION] Luke needs to quit the job to honor Martin's contract terms and attend World Cup trip
+[TASK] Luke should tell parents today (Sunday) about quitting the job, then message Martin on Tuesday with honest explanation
+[GOAL] Clear schedule for Zekka + Cancun trip + setter commissions instead
