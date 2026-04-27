@@ -185,3 +185,10 @@
 [FACT] The Cancun trip is with the actual business owners who hired Luke — not a casual group trip
 [GOAL] Luke needs to reframe the Cancun trip to his parents as business networking/relationship building with legitimate operators, not an impulsive personal trip
 [IDEA] Create a one-pager for Luke's parents showing Alan, Luke, and Chris's business backgrounds + the professional purpose of the trip + logistics to shift narrative from impulsive to strategic networking
+
+### 2026-04-27 10:58 UTC
+[TASK] Get written confirmation from trip organizers (Alan/Luke/Chris) — full names, LinkedIn profiles, accommodation address (Airbnb screenshot), daily itinerary, emergency contact, travel insurance details, refund policy
+[TASK] Create one-page trip plan for parents showing: who/where/when/what, cost breakdown, daily schedule, check-in protocol (daily texts, calls every 2 days)
+[TASK] Frame trip as business opportunity for Zekka — document who he's meeting, entrepreneur connections being made, link to summer revenue goals
+[TASK] Purchase travel insurance ($15-30) before pitching to parents again
+[DECISION] Need all documentation ready BEFORE re-pitching to parents, not after — legitimacy on paper is the barrier
