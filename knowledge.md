@@ -254,3 +254,10 @@
 [DECISION] Luke is quitting Martin's job regardless of whether they let him go — non-negotiable family World Cup trip mid-summer conflicts with Martin's 6-week no-trips contract.
 [TASK] Tell parents today that he can't do the summer job due to World Cup trip conflict, and he's going all-in on Zekka instead.
 [TASK] Message Martin on Tuesday (after parent conversation) with honest, respectful explanation about family trip conflicting with no-trips requirement.
+
+### 2026-04-27 17:38 UTC
+[PERSONAL] Luke feels his parents won't help because they disapprove of what he's doing — actually they're scared about the $3,500 debt + job loss + Cancun trip happening simultaneously at age 18
+[IDEA] Reframe the conversation with parents: don't ask permission, ask for help *framing* how to tell Martin respectfully — positions this as maturity, not controversy
+[TASK] Message Martin this week explaining he can't honor the 6-week no-trips contract due to family commitment (World Cup), showing integrity rather than disappearing
+[STRATEGY] Separate three conversations: (1) Martin/job exit, (2) Dealership ads pitch with Zekka numbers, (3) Cancun trip — only after full documentation ready
+[GOAL] Get parents to help with Martin framing first; once they see Luke handling it respectfully, the door opens for dealership and Zekka pitches
