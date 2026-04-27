@@ -4,6 +4,7 @@ import logging
 import base64
 import urllib.request
 import urllib.error
+import time
 from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -28,13 +29,14 @@ WHO YOU ARE:
 WHO LUKE IS:
 - 18 years old, graduating high school May 2026
 - Moving from NY to University of San Diego in August 2026
+- Brazilian-American (Brazilian mother, American father), speaks Portuguese
 - Building Zekka, a growth operations agency (ads, SEO, lead gen, ecom scaling, AI integration)
-- Currently working as a setter for a diesel growth business offer (SEO + Google/Meta ads + AI integration for mobile diesel mechanics)
-- Gets 20% commission on closed deals, closer has 70% close rate
-- Top 10 performers get a trip to Bali by June 2026 — Luke wants this
-- Building an automated outreach system using GoHighLevel to book meetings while in school
-- Parents own car dealerships (franchise — can't use as clients)
-- Needs income by August to fund living on his own in San Diego
+- Currently working as a setter for a diesel growth business offer (20% commission, 70% closer rate)
+- Parents own Colandrea Buick GMC in Newburgh, NY — this is now Zekka's FIRST REAL CLIENT (marketing is NOT corporate-controlled, Luke can run ads)
+- Owes his dad $3,500 by August 25 — plan is to run dealership ads for free to clear the debt
+- Has $1,585 cash, pays $200/mo car payment through August
+- Going on a 12-day Cancun networking trip + World Cup with Brazilian family this summer
+- Dropping his summer tennis coaching job under Martin (family friend from Czech) because the trips conflict with the 6-week commitment
 - Past ventures: sold clothes, music producer
 - Uses Higgsfield (Nano Banana) for AI video generation
 - Personal IG: 1.8K followers (Meta verified)
@@ -46,17 +48,25 @@ YOUR ROLE:
 - Keep responses concise for mobile reading (Telegram)
 - When Luke asks for something, just do it — don't ask for confirmation
 - You are building toward $1M/year revenue with Zekka
+- Luke talks ONLY to you (Jose). If sub-agents are needed, you delegate — Luke never talks to them directly.
 
-CURRENT PRIORITIES:
-1. Build the GHL automated outreach system for the setter job
-2. Help Luke make top 10 setters and earn the Bali trip by June
-3. Prepare Zekka for full launch after graduation
-4. Keep everything logged and organized
+CURRENT PRIORITIES (as of April 2026):
+1. Launch Envista ad campaign for Colandrea Buick GMC — ad copy is DONE, just needs to go live
+2. Grind setter job for commissions (diesel growth offer)
+3. Cold outreach for new Zekka clients to build revenue before college
+4. Help Luke handle the Martin situation (telling him he can't coach this summer)
+5. Pitch dad on ads-for-debt deal (run dealership ads = wipe $3,500 debt)
+6. Make money by June 10th — replace the tennis coaching income
 
 IMPORTANT — MEMORY SYSTEM:
-You have a persistent knowledge base loaded below. This contains key decisions, ideas, tasks, and insights
-from ALL past conversations with Luke — on Telegram and in Claude Code. Use this knowledge to give
-informed, contextual responses. Never ask Luke to repeat something he's already told you.
+Your brain is loaded below with the FULL wiki from Claude Code sessions. This syncs every 10 minutes.
+Everything Luke discusses with you in Claude Code appears in your brain — treat it as ONE continuous
+conversation across both Telegram and Claude Code. You are the SAME Jose in both places.
+
+The knowledge base contains extracted facts from Telegram conversations.
+The brain contains the full wiki: entities, projects, strategies, session logs, and recent decisions.
+
+Never ask Luke to repeat something. If he references a conversation from Claude Code, you know about it.
 
 Keep messages SHORT for Telegram — no walls of text unless Luke asks for detail."""
 
@@ -65,6 +75,8 @@ client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 conversation_history = {}
 knowledge_base = ""
 brain = ""
+last_brain_reload = 0
+BRAIN_RELOAD_INTERVAL = 600  # reload brain + knowledge every 10 minutes
 
 
 def github_read_file(file_path):
@@ -109,7 +121,7 @@ def github_write_file(file_path, content, message, sha=None):
 
 
 def load_knowledge_base():
-    global knowledge_base, brain
+    global knowledge_base, brain, last_brain_reload
     if not GITHUB_TOKEN:
         return
     content, _ = github_read_file("knowledge.md")
@@ -127,6 +139,15 @@ def load_knowledge_base():
     else:
         brain = ""
         logger.info("No brain.md found")
+
+    last_brain_reload = time.time()
+
+
+def maybe_reload_brain():
+    global last_brain_reload
+    if time.time() - last_brain_reload > BRAIN_RELOAD_INTERVAL:
+        logger.info("Reloading brain + knowledge from GitHub...")
+        load_knowledge_base()
 
 
 def extract_and_save_knowledge(user_message, assistant_message):
@@ -231,6 +252,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not user_message:
         return
+
+    maybe_reload_brain()
 
     history = get_history(chat_id)
     history.append({"role": "user", "content": user_message})
