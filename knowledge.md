@@ -143,3 +143,11 @@
 [DECISION] Trip changed from Bali to Cancun, mid-June timing for top 10 setters celebration
 [GOAL] Hit top 10 setters by mid-June, then lock in Zekka revenue July-early August before USD move
 [IDEA] Google Shopping (Buicks with inventory images) or Meta carousel ads for local intent conversion focus
+
+### 2026-04-27 03:46 UTC
+[TASK] Talk to parents this Sunday (Apr 27) about contacting Martin before reaching out to him directly
+[FACT] Martin is a close family friend from Czech; Luke's parents know him personally
+[FACT] Martin won't be back until May, so there's time for him to find a replacement
+[DECISION] Message Martin Monday-Tuesday (after parent conversation), not now
+[PERSONAL] Need parents' buy-in on how to frame the conversation with Martin to preserve relationships
+[TASK] Launch Envista ads and grind setter job this week
