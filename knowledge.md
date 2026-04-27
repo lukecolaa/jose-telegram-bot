@@ -158,3 +158,8 @@
 ### 2026-04-27 03:57 UTC
 [DECISION] Luke is quitting the hob (tennis job with Martin)
 [PERSONAL] Luke is feeling nervous about this decision
+
+### 2026-04-27 03:58 UTC
+[FACT] Luke confirmed Jose has complete access to ALL knowledge — financial, campaign, personal, goals, strategies, health, everything
+[FACT] Jose is integrated across Telegram and Claude Code as one continuous system with no information loss
+[PERSONAL] Luke experienced insomnia last night
