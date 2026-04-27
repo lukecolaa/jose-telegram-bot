@@ -209,3 +209,11 @@
 [TASK] Luke needs to handle Cancun trip as separate issue with full documentation, parent contact, and insurance
 [FACT] Martin's job terms: 6 weeks, no trips allowed; this is incompatible with Luke's World Cup commitment
 [IDEA] Keep job decision and Cancun decision separate — don't use one as cover for the other; be honest about constraints with Martin
+
+### 2026-04-27 12:45 UTC
+[FACT] Luke spoke to family earlier about dropping tennis + Cancun trip; they rejected both ideas, citing impulsive decisions and financial risk due to money owed
+[FACT] Family thinks tennis job is safer choice; they're cautious about Luke's financial tight spot
+[IDEA] Separate the World Cup trip (family commitment, non-negotiable) from the Cancun conversation — frame World Cup as obligation, not impulse
+[IDEA] Lead with Zekka business case: show dealership ad campaign numbers, setter commission structure (20% per close), concrete $6-8K revenue target by August
+[IDEA] Delay Cancun pitch 2-3 days; gather full trip documentation (Alan's LinkedIn, Airbnb proof, itinerary, insurance) then present as professional one-pager
+[TASK] Get Cancun trip docs before re-approaching family
