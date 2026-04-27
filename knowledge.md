@@ -244,3 +244,8 @@
 [DECISION] Luke doesn't want cold calling — prefers channels that bypass gatekeepers and focus on warm/qualified leads
 [IDEA] Jose outlined alternative lead channels: LinkedIn DMs, Facebook Groups (diesel/fleet communities), Google Maps owner pulls, referrals from closed deals, Instagram DMs
 [TASK] Jose waiting on update about dad conversation re: dealership ad campaign to prioritize next steps (setter outreach vs. ad campaign)
+
+### 2026-04-27 17:36 UTC
+[DECISION] Luke decided NOT to cold call diesel shops when going home — needs to save energy for the dad conversation about dealership ad opportunity and $3,500 debt
+[GOAL] Priority sequence: (1) Talk to Rick about dealership ads + debt solution, (2) Get budget confirmation, (3) Launch Envista campaign this week, (4) Then resume setter calls and cold outreach
+[PERSONAL] Luke recognizes he needs to be calm and strategic for the dad conversation, not in sales/rejection-mode from cold calling beforehand
