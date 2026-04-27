@@ -232,3 +232,10 @@
 [IDEA] Luke's strategy: chill 20-30 min when home, wait for dad to settle, ask for ad budget for Envista inventory, frame debt clearance as conditional on campaign success
 [TASK] Keep conversation about Martin separate — handle dealership discussion first, then address Martin topic later (Tuesday or after)
 [PERSONAL] Luke is preparing for an important conversation with his dad; timing and approach matter
+
+### 2026-04-27 17:27 UTC
+[DECISION] Luke choosing rest + gym over scheduling meetings while home
+[PERSONAL] Luke has a big conversation with his dad coming up
+[IDEA] Jose advises prioritizing mental clarity and calm for the dad conversation rather than rushing meetings
+[FACT] Luke has a dealership ad pitch in progress
+[PERSONAL] Luke's energy/mental state affects pitch performance
