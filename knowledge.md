@@ -249,3 +249,8 @@
 [DECISION] Luke decided NOT to cold call diesel shops when going home — needs to save energy for the dad conversation about dealership ad opportunity and $3,500 debt
 [GOAL] Priority sequence: (1) Talk to Rick about dealership ads + debt solution, (2) Get budget confirmation, (3) Launch Envista campaign this week, (4) Then resume setter calls and cold outreach
 [PERSONAL] Luke recognizes he needs to be calm and strategic for the dad conversation, not in sales/rejection-mode from cold calling beforehand
+
+### 2026-04-27 17:36 UTC
+[DECISION] Luke is quitting Martin's job regardless of whether they let him go — non-negotiable family World Cup trip mid-summer conflicts with Martin's 6-week no-trips contract.
+[TASK] Tell parents today that he can't do the summer job due to World Cup trip conflict, and he's going all-in on Zekka instead.
+[TASK] Message Martin on Tuesday (after parent conversation) with honest, respectful explanation about family trip conflicting with no-trips requirement.
