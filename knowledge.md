@@ -151,3 +151,6 @@
 [DECISION] Message Martin Monday-Tuesday (after parent conversation), not now
 [PERSONAL] Need parents' buy-in on how to frame the conversation with Martin to preserve relationships
 [TASK] Launch Envista ads and grind setter job this week
+
+### 2026-04-27 03:57 UTC
+[PERSONAL] Luke is experiencing insomnia due to nervousness — something is causing him significant anxiety right now
