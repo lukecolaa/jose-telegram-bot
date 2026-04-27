@@ -239,3 +239,8 @@
 [IDEA] Jose advises prioritizing mental clarity and calm for the dad conversation rather than rushing meetings
 [FACT] Luke has a dealership ad pitch in progress
 [PERSONAL] Luke's energy/mental state affects pitch performance
+
+### 2026-04-27 17:35 UTC
+[DECISION] Luke doesn't want cold calling — prefers channels that bypass gatekeepers and focus on warm/qualified leads
+[IDEA] Jose outlined alternative lead channels: LinkedIn DMs, Facebook Groups (diesel/fleet communities), Google Maps owner pulls, referrals from closed deals, Instagram DMs
+[TASK] Jose waiting on update about dad conversation re: dealership ad campaign to prioritize next steps (setter outreach vs. ad campaign)
