@@ -178,3 +178,10 @@
 
 ### 2026-04-27 10:56 UTC
 [FACT] Three people Luke mentioned: Alan Caro, Luke Smital, and Chris Campos — context needed on their roles/relevance to current projects
+
+### 2026-04-27 10:57 UTC
+[FACT] Alan Caro, Luke Smital, and Chris Campos are the owners of the mobile diesel growth offer
+[FACT] Luke is a setter for this diesel growth offer with a commission structure tied to these decision-makers
+[FACT] The Cancun trip is with the actual business owners who hired Luke — not a casual group trip
+[GOAL] Luke needs to reframe the Cancun trip to his parents as business networking/relationship building with legitimate operators, not an impulsive personal trip
+[IDEA] Create a one-pager for Luke's parents showing Alan, Luke, and Chris's business backgrounds + the professional purpose of the trip + logistics to shift narrative from impulsive to strategic networking
