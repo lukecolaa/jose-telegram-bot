@@ -225,3 +225,10 @@
 [DECISION] Luke needs to quit the job to honor Martin's contract terms and attend World Cup trip
 [TASK] Luke should tell parents today (Sunday) about quitting the job, then message Martin on Tuesday with honest explanation
 [GOAL] Clear schedule for Zekka + Cancun trip + setter commissions instead
+
+### 2026-04-27 17:24 UTC
+[TASK] Luke needs to wait for dad to get home from work before having a conversation
+[TASK] Luke will be home from school soon and needs to approach dad with a plan about dealership ads and the $3,500 debt
+[IDEA] Luke's strategy: chill 20-30 min when home, wait for dad to settle, ask for ad budget for Envista inventory, frame debt clearance as conditional on campaign success
+[TASK] Keep conversation about Martin separate — handle dealership discussion first, then address Martin topic later (Tuesday or after)
+[PERSONAL] Luke is preparing for an important conversation with his dad; timing and approach matter
