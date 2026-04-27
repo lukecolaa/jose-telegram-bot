@@ -168,3 +168,10 @@
 [PERSONAL] Luke is 18 but parents are concerned about safety on a trip to Cancun staying with people he doesn't know in another country — they're blocking the trip despite his age
 [PERSONAL] Luke has a tennis commitment that may be conflicting with the Cancun trip plans
 [IDEA] Jose is helping Luke separate the immediate fear (Cancun safety) from the deeper concern (parental worry about him being irresponsible/unsafe), and needs clarity on: who's organizing the trip, whether Luke explained the business purpose (Zekka networking), what the parents' specific fear is, and whether they're rejecting the trip entirely or just the living situation
+
+### 2026-04-27 10:49 UTC
+[PERSONAL] Luke's parents are against the Cancun trip — they see it as dangerous, a scam, and fear he'll burn the bridge with Martin (family friend/job connection); parents feed off each other's negativity about it
+[DECISION] Luke is already committed to dropping tennis this summer; needs to tell Martin separately from the trip decision to show respect for his time
+[FACT] Luke owes money and parents are concerned about an 18-year-old making impulsive decisions (job drop + Mexico trip + mentores group)
+[TASK] Luke needs to gather concrete details about the mentores trip: real names/backgrounds of organizers, accommodation specifics, daily schedule, budget breakdown, check-in protocol, travel insurance/emergency plan — to present a professional plan to parents
+[IDEA] Reframe trip to parents as a business/networking opportunity for Zekka growth with established mentors, not an adventure; position it like a business trip
