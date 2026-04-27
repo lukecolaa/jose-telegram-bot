@@ -154,3 +154,7 @@
 
 ### 2026-04-27 03:57 UTC
 [PERSONAL] Luke is experiencing insomnia due to nervousness — something is causing him significant anxiety right now
+
+### 2026-04-27 03:57 UTC
+[DECISION] Luke is quitting the hob (tennis job with Martin)
+[PERSONAL] Luke is feeling nervous about this decision
