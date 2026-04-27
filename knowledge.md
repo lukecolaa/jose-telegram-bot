@@ -201,3 +201,11 @@
 [TASK] Purchase travel insurance ($25-40) and show parents the policy
 [TASK] Create one-pager for parents with: attendees + photos/LinkedIn, Airbnb address, trip dates, business purpose (Zekka networking), daily check-in commitment, cost breakdown
 [GOAL] Present parents with complete, verifiable information to shift decision from fear-based to informed
+
+### 2026-04-27 12:43 UTC
+[DECISION] Luke is conflicted about quitting tennis job; Jose advised him to quit regardless because World Cup trip (~1 week, Brazilian family/mom, non-negotiable) violates Martin's 6-week no-trips requirement — it's a contract breach either way
+[TASK] Luke needs to talk to parents today (Sunday) to explain job quit decision, framed as inability to honor 6-week no-trips commitment due to World Cup trip
+[TASK] Luke should message Martin on Tuesday (after parent conversation) about quitting the job — keeping it separate from Cancun trip discussion
+[TASK] Luke needs to handle Cancun trip as separate issue with full documentation, parent contact, and insurance
+[FACT] Martin's job terms: 6 weeks, no trips allowed; this is incompatible with Luke's World Cup commitment
+[IDEA] Keep job decision and Cancun decision separate — don't use one as cover for the other; be honest about constraints with Martin
