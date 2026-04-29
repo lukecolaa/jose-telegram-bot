@@ -356,3 +356,11 @@
 - [DECISION] Wait 2-3 days before revisiting Cancun with parents; bring documented proof (Alan's LinkedIn, Airbnb, itinerary, insurance) when they've recovered from bad day
 - [PERSONAL] Luke feels time pressure on Cancun trip announcement but has 6+ weeks before mid-June; Martin conversation is the actual urgent deadline
 - [PERSONAL] Luke's parents had a rough day at work—tonight is wrong timing for difficult conversations; better approach is showing thoughtfulness by giving them space
+
+### 2026-04-29 23:10 UTC
+[FACT] Luke procrastinates when anxious; hasn't messaged Martin yet about World Cup trip conflict
+[FACT] Luke has non-negotiable World Cup trip mid-summer with mom; conflicts with Martin's 6-week no-trips contract requirement
+[FACT] Luke needs money for college; setter calls/closes generate $600-1000/close
+[DECISION] Luke should message Martin Thursday (tomorrow) via text disclosing trip conflict and resigning; needs to specify timing
+[GOAL] Luke needs to stop anxiety-driven negotiation fantasies (trading at 9:30am, "maybe he'd be lenient") and take direct action
+[PERSONAL] Luke is scared/nervous about confrontation; using procrastination as avoidance mechanism; anxiety building from uncertainty
