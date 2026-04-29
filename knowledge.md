@@ -388,3 +388,12 @@
 [TASK] Write the letter to Martin tonight
 [TASK] Send message to Martin Thursday morning or afternoon (before giving paper to parents)
 [TASK] Give paper to parents Thursday after Martin has received message
+
+### 2026-04-29 23:16 UTC
+[FACT] Luke has a World Cup trip with family mid-summer that's non-negotiable
+[FACT] Martin's contract terms are "6 weeks, no trips" — a firm rule, not negotiable
+[DECISION] Luke is considering asking Martin for an exception to miss one week
+[PERSONAL] Luke is experiencing anxiety about this situation and the decision to make
+[TASK] Luke needs to message Martin Thursday morning being direct about the family commitment and inability to meet the no-trips contract
+[IDEA] Jose advised Luke that asking for an exception puts Martin in an awkward position and keeps Luke in limbo — better to be honest upfront and give Martin time to find a replacement
+[GOAL] Luke should commit to sending the message Thursday morning to resolve the anxiety
