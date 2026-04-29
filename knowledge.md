@@ -304,3 +304,8 @@
 [FACT] Luke has three unstable income streams (setter commissions, dealership ads, Cancun trip) and is about to drop Martin guaranteed income
 [FACT] Luke's parents already concerned about his financial decisions
 [PERSONAL] Jose pushing Luke to examine whether course decision is driven by genuine belief, fear of other income failing, or peer pressure
+
+### 2026-04-29 16:17 UTC
+[FACT] Luke needs money urgently and is considering a funded trading account course ($1,250/mo) after seeing others claim $1,800/mo profits in their first month with zero experience
+[FACT] Those traders are using funded accounts (not their own capital), joined one month ago with zero experience — statistically suspicious pattern (likely cherry-picked results, paper trading, or program skew)
+[TASK] Luke needs to provide real numbers on current income streams before chasing trading: setter commission closes/week, Envista dealership ad launch status, Zekka cold outreach pipeline
