@@ -397,3 +397,10 @@
 [TASK] Luke needs to message Martin Thursday morning being direct about the family commitment and inability to meet the no-trips contract
 [IDEA] Jose advised Luke that asking for an exception puts Martin in an awkward position and keeps Luke in limbo — better to be honest upfront and give Martin time to find a replacement
 [GOAL] Luke should commit to sending the message Thursday morning to resolve the anxiety
+
+### 2026-04-29 23:21 UTC
+[PERSONAL] Luke is 18, building a business, and planning to move across the country
+[PERSONAL] Luke has a non-negotiable family trip mid-summer that conflicts with work commitment to Martin
+[DECISION] Luke is considering asking Martin for an exception to a no-trips contract rule, driven by anxiety rather than strategy
+[TASK] Luke needs to send Martin a message Thursday morning disclosing the family trip upfront (giving 6+ weeks notice) instead of asking for an exception
+[IDEA] Being upfront about the conflict early signals professionalism and integrity, and tests whether Martin respects boundaries
