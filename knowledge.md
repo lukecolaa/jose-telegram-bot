@@ -349,3 +349,10 @@
 [TASK] Thursday-Friday: Set 3-5 meetings with closers
 [TASK] Next week: Closers convert meetings, Luke earns $600-1000+ commission from first close
 [IDEA] Volume of conversations with real decision-makers is the bottleneck, not copy quality or system sophistication
+
+### 2026-04-29 23:03 UTC
+- [TASK] Tell Martin about quitting tennis this week (Tue/Wed) via text while he's in Czech—frame as non-negotiable family conflict, give him time to find replacement coach
+- [TASK] Focus on Buick campaign tonight instead of bringing up Cancun or Martin—build credibility with parents through work
+- [DECISION] Wait 2-3 days before revisiting Cancun with parents; bring documented proof (Alan's LinkedIn, Airbnb, itinerary, insurance) when they've recovered from bad day
+- [PERSONAL] Luke feels time pressure on Cancun trip announcement but has 6+ weeks before mid-June; Martin conversation is the actual urgent deadline
+- [PERSONAL] Luke's parents had a rough day at work—tonight is wrong timing for difficult conversations; better approach is showing thoughtfulness by giving them space
