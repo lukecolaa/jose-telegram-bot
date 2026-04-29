@@ -297,3 +297,10 @@
 [FACT] World Cup trip is a hard constraint that makes Martin contract physically impossible to fulfill
 [IDEA] Frame job decline to parents as constraint issue (can't honor contract terms) rather than impulsive decision
 [DECISION] Pending: Determine if Cancun trip is essential for Zekka growth or optional — will inform whether to drop it alongside Martin job decline
+
+### 2026-04-29 16:16 UTC
+[DECISION] Luke considering $5K trading course ($1,250/mo) despite having only $1,585 cash and owing $3,500 by Aug 25
+[FACT] Luke's peers claim $1.8K/mo from trading; course costs $1,250/mo or $5K upfront
+[FACT] Luke has three unstable income streams (setter commissions, dealership ads, Cancun trip) and is about to drop Martin guaranteed income
+[FACT] Luke's parents already concerned about his financial decisions
+[PERSONAL] Jose pushing Luke to examine whether course decision is driven by genuine belief, fear of other income failing, or peer pressure
