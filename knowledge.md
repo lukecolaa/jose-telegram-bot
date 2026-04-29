@@ -327,3 +327,8 @@
 [IDEA] Jose challenged Luke's real motivation — he's not actually asking about copying trades, he's asking how to get money fast because he's worried about income streams
 [TASK] Jose directly asked Luke: How many setter closes have you made in the last 2 weeks? (This is the real metric that determines if Luke needs a backup plan or not)
 [PERSONAL] Luke appears to be anxious about hitting a $3,500 financial target by July and is looking for shortcuts instead of focusing on his primary income (setter closes)
+
+### 2026-04-29 16:21 UTC
+[TASK] Luke wants research done on Alan Caros and his Covenant Circle — need to determine what it is, credibility, and whether it's legitimate or a multi-program pitch to same audience
+[FACT] Alan Caros is connected to multiple opportunities Luke is involved with: diesel growth offer (with Luke Smital & Chris Campos as setters), trading/funded account program, and now Covenant Circle
+[PERSONAL] Pattern emerging of Alan positioning himself across multiple business lanes — Luke is evaluating his credibility and whether this warrants deeper scrutiny
