@@ -339,3 +339,13 @@
 [FACT] Luke is considering a $1,250/mo trading course while facing financial pressure — Jose identifies this as panic-driven, not strategy-driven
 [GOAL] Three income streams in progress: (1) Setter closes, (2) Envista ads launch, (3) Zekka cold outreach — all currently stalled or untracked
 [TASK] Jose asking Luke to report actual setter closes made in last 2 weeks and progress on dealership pitch + setter calls since Sunday
+
+### 2026-04-29 16:23 UTC
+[FACT] Luke has never closed a deal — this is the primary blocker causing panic about $3,500 deadline
+[FACT] Luke is a setter (20% commission), not the closer — job is booking meetings with diesel shop owners, closers (Alan, Luke, Chris) handle pitches
+[DECISION] Luke needs to stop research spiral immediately — no trading courses, funded accounts, or Covenant Circle analysis this week
+[GOAL] Close first deal this week to prove model works and eliminate anxiety
+[TASK] Monday-Wednesday: 10-15 calls/DMs daily to diesel shop owners (Google Maps, Facebook, LinkedIn)
+[TASK] Thursday-Friday: Set 3-5 meetings with closers
+[TASK] Next week: Closers convert meetings, Luke earns $600-1000+ commission from first close
+[IDEA] Volume of conversations with real decision-makers is the bottleneck, not copy quality or system sophistication
