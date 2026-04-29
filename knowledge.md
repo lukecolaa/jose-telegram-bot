@@ -412,3 +412,8 @@
 [FACT] Martin is currently in Czech, will be back soon
 [FACT] Martin has a no-trips policy for the role
 [PERSONAL] Luke values keeping Martin as a family friend rather than creating conflict
+
+### 2026-04-29 23:23 UTC
+[DECISION] Luke asked for a coaching job but now realizes he can't commit to Martin's 6-week, no-trips requirement due to a World Cup trip with his mom mid-summer.
+[IDEA] Jose advised early honesty over last-minute cancellation — send a direct message Thursday morning explaining the conflict, respecting Martin's time to find a replacement rather than disappearing in June.
+[PERSONAL] Luke feels guilty about asking for the job, but the situation changed when the World Cup trip came up; Jose reframed this as a choice between early honesty vs. waiting to bail.
