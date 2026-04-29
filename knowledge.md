@@ -364,3 +364,10 @@
 [DECISION] Luke should message Martin Thursday (tomorrow) via text disclosing trip conflict and resigning; needs to specify timing
 [GOAL] Luke needs to stop anxiety-driven negotiation fantasies (trading at 9:30am, "maybe he'd be lenient") and take direct action
 [PERSONAL] Luke is scared/nervous about confrontation; using procrastination as avoidance mechanism; anxiety building from uncertainty
+
+### 2026-04-29 23:11 UTC
+[PERSONAL] Luke feels isolated—entire setter group celebrating in Cancun while he grinds alone, killing motivation more than money/Martin concerns
+[DECISION] The real choice isn't Cancun vs. home grind; it's celebrating with crew + network recharge vs. solo demoralization that tanks July performance
+[IDEA] Reframe parents' conversation: trip is business reward + networking event that compounds momentum, not vacation expense—gets Alan's LinkedIn + itinerary as proof
+[TASK] Get documentation this week (Alan's LinkedIn, full trip schedule, attendees, daily breakdown) to pitch parents as legitimate business event, not party trip
+[GOAL] Use Cancun momentum to fuel July-August grind (Envista, Zekka outreach, college prep) with relationships + recharged motivation intact
