@@ -289,3 +289,11 @@
 [FACT] Luke has a non-negotiable World Cup trip with his mom mid-summer that conflicts with Martin's no-trip policy
 [PERSONAL] Luke is 18 and making multiple big life changes fast; parents are scared about financial instability + risky decisions
 [TASK] Luke needs to clarify: (1) Is World Cup trip with mom definitely happening? (2) What do parents actually want him to do instead? (3) Is Cancun optional or essential for him?
+
+### 2026-04-29 16:13 UTC
+[GOAL] Luke is 100% committed to attending World Cup for a week mid-summer with Brazilian family
+[DECISION] Martin's 6-week summer job with no-trips policy is incompatible with World Cup commitment — needs to be declined
+[TASK] Message Martin this week to decline job, citing non-negotiable family commitment mid-summer
+[FACT] World Cup trip is a hard constraint that makes Martin contract physically impossible to fulfill
+[IDEA] Frame job decline to parents as constraint issue (can't honor contract terms) rather than impulsive decision
+[DECISION] Pending: Determine if Cancun trip is essential for Zekka growth or optional — will inform whether to drop it alongside Martin job decline
