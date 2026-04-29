@@ -404,3 +404,11 @@
 [DECISION] Luke is considering asking Martin for an exception to a no-trips contract rule, driven by anxiety rather than strategy
 [TASK] Luke needs to send Martin a message Thursday morning disclosing the family trip upfront (giving 6+ weeks notice) instead of asking for an exception
 [IDEA] Being upfront about the conflict early signals professionalism and integrity, and tests whether Martin respects boundaries
+
+### 2026-04-29 23:23 UTC
+[DECISION] Luke can't commit to full 6-week summer role due to family trip mid-summer that can't be moved
+[TASK] Send message to Martin Thursday 9am explaining unavailability respectfully, with no exceptions requested
+[TASK] Hand letter to parents Thursday evening after sending message to Martin
+[FACT] Martin is currently in Czech, will be back soon
+[FACT] Martin has a no-trips policy for the role
+[PERSONAL] Luke values keeping Martin as a family friend rather than creating conflict
