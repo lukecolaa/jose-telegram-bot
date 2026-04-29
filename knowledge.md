@@ -376,3 +376,8 @@
 [TASK] Write out decision on paper tonight to give to parents tomorrow — include World Cup trip timing, Martin's contract conflict, alternative plan (setter calls, Envista ads, Zekka work), revenue targets, college deadline in August, Martin needs replacement this week, acknowledge $3,500 debt and their financial concerns
 [DECISION] Deliver written document to parents when they're calm, not after a rough day — removes emotion, gives them something to reference later, protects Luke with proof
 [PERSONAL] Luke worried about parents' reaction but recognizes written approach shows seriousness and thought-through planning vs. impulsive complaint
+
+### 2026-04-29 23:15 UTC
+[TASK] Write something on paper tonight and send Jose a draft
+[TASK] Hand written piece to someone tomorrow after Jose reviews it
+[PERSONAL] Jose asking how Luke is feeling right now
