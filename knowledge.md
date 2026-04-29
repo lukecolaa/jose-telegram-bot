@@ -309,3 +309,9 @@
 [FACT] Luke needs money urgently and is considering a funded trading account course ($1,250/mo) after seeing others claim $1,800/mo profits in their first month with zero experience
 [FACT] Those traders are using funded accounts (not their own capital), joined one month ago with zero experience — statistically suspicious pattern (likely cherry-picked results, paper trading, or program skew)
 [TASK] Luke needs to provide real numbers on current income streams before chasing trading: setter commission closes/week, Envista dealership ad launch status, Zekka cold outreach pipeline
+
+### 2026-04-29 16:18 UTC
+[FACT] Alan runs a trading course claiming 60% of students can pay off the next month's fee with trading profits in their first month with zero skill
+[IDEA] Jose questions the sustainability of 60% month-1 success rate and whether it holds up beyond initial period when patterns break
+[DECISION] Jose is advising Luke NOT to join the trading course yet — prioritizing execution on existing opportunities (setter job, Envista ads, Zekka outreach) over adding a new income stream
+[TASK] Jose asking Luke for status update on: (1) setter closes this week, (2) Envista launch timeline, (3) Zekka cold outreach activity
