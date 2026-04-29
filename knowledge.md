@@ -282,3 +282,10 @@
 [FACT] There are at least 3 possible contexts: Martin job, Cancun trip, or both
 [FACT] Luke's parents expressed opposition/don't want him to go
 [TASK] Luke needs to clarify which situation(s) his parents objected to and their specific concerns/reasons
+
+### 2026-04-29 16:12 UTC
+[DECISION] Luke is quitting the Martin job and wants to go to Cancun — parents are against both moves
+[FACT] Luke owes $3,500 and currently makes $200/week with Martin
+[FACT] Luke has a non-negotiable World Cup trip with his mom mid-summer that conflicts with Martin's no-trip policy
+[PERSONAL] Luke is 18 and making multiple big life changes fast; parents are scared about financial instability + risky decisions
+[TASK] Luke needs to clarify: (1) Is World Cup trip with mom definitely happening? (2) What do parents actually want him to do instead? (3) Is Cancun optional or essential for him?
