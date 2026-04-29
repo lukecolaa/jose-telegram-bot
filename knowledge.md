@@ -371,3 +371,8 @@
 [IDEA] Reframe parents' conversation: trip is business reward + networking event that compounds momentum, not vacation expense—gets Alan's LinkedIn + itinerary as proof
 [TASK] Get documentation this week (Alan's LinkedIn, full trip schedule, attendees, daily breakdown) to pitch parents as legitimate business event, not party trip
 [GOAL] Use Cancun momentum to fuel July-August grind (Envista, Zekka outreach, college prep) with relationships + recharged motivation intact
+
+### 2026-04-29 23:14 UTC
+[TASK] Write out decision on paper tonight to give to parents tomorrow — include World Cup trip timing, Martin's contract conflict, alternative plan (setter calls, Envista ads, Zekka work), revenue targets, college deadline in August, Martin needs replacement this week, acknowledge $3,500 debt and their financial concerns
+[DECISION] Deliver written document to parents when they're calm, not after a rough day — removes emotion, gives them something to reference later, protects Luke with proof
+[PERSONAL] Luke worried about parents' reaction but recognizes written approach shows seriousness and thought-through planning vs. impulsive complaint
