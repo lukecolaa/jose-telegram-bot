@@ -332,3 +332,10 @@
 [TASK] Luke wants research done on Alan Caros and his Covenant Circle — need to determine what it is, credibility, and whether it's legitimate or a multi-program pitch to same audience
 [FACT] Alan Caros is connected to multiple opportunities Luke is involved with: diesel growth offer (with Luke Smital & Chris Campos as setters), trading/funded account program, and now Covenant Circle
 [PERSONAL] Pattern emerging of Alan positioning himself across multiple business lanes — Luke is evaluating his credibility and whether this warrants deeper scrutiny
+
+### 2026-04-29 16:22 UTC
+[FACT] Luke has seen peers actually get paid in the setter/sales role — this is real proof, not just hype
+[FACT] Luke owes $3,500 by late August and has $1,585 in the bank
+[FACT] Luke is considering a $1,250/mo trading course while facing financial pressure — Jose identifies this as panic-driven, not strategy-driven
+[GOAL] Three income streams in progress: (1) Setter closes, (2) Envista ads launch, (3) Zekka cold outreach — all currently stalled or untracked
+[TASK] Jose asking Luke to report actual setter closes made in last 2 weeks and progress on dealership pitch + setter calls since Sunday
