@@ -261,3 +261,10 @@
 [TASK] Message Martin this week explaining he can't honor the 6-week no-trips contract due to family commitment (World Cup), showing integrity rather than disappearing
 [STRATEGY] Separate three conversations: (1) Martin/job exit, (2) Dealership ads pitch with Zekka numbers, (3) Cancun trip — only after full documentation ready
 [GOAL] Get parents to help with Martin framing first; once they see Luke handling it respectfully, the door opens for dealership and Zekka pitches
+
+### 2026-04-29 16:09 UTC
+[DECISION] Luke hasn't quit Martin yet despite already committing to World Cup trip mid-summer that conflicts with Martin's no-trips requirement — fear of losing $200/week guaranteed income is holding him back
+[FACT] Luke's financial situation: has $1,585, owes $3,500; current guaranteed income is $200/week from Martin's country club coaching
+[FACT] Luke's income sources lined up: setter commissions (20%, 70% closer rate), Envista ads campaign launching this week, potential dad-backed dealership ad budget
+[PERSONAL] Luke feels scared and nervous about change, worried about losing safety net and whether setter commissions will actually materialize — but already made the decision to prioritize World Cup trip with mom and Brazilian family
+[TASK] Luke needs to message Martin today or tomorrow with honest, respectful notice about not doing summer coaching job (before Martin plans around him) — this will reduce anxiety and show integrity to parents
