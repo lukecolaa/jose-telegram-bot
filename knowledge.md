@@ -320,3 +320,10 @@
 [PERSONAL] Luke is scared about income security; three income streams haven't materialized yet (setter commissions unclear, dealership ads not launched, Zekka not actively cold outreaching)
 [DECISION] Luke is considering joining Alan's trading course ($1,250/mo) as a safety net despite owing $3,500; Jose advises against it as panic spending
 [IDEA] Jose's strategy: Give the three current income streams 3 weeks (May 1-21) to hit real numbers before considering trading course as backup
+
+### 2026-04-29 16:20 UTC
+[FACT] Luke can copy Alan's trades with a $50K funded account and take payouts, but funded accounts have profit caps, drawdown limits, and time locks
+[FACT] One month of Alan's track record isn't enough data to rely on long-term
+[IDEA] Jose challenged Luke's real motivation — he's not actually asking about copying trades, he's asking how to get money fast because he's worried about income streams
+[TASK] Jose directly asked Luke: How many setter closes have you made in the last 2 weeks? (This is the real metric that determines if Luke needs a backup plan or not)
+[PERSONAL] Luke appears to be anxious about hitting a $3,500 financial target by July and is looking for shortcuts instead of focusing on his primary income (setter closes)
