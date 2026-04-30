@@ -484,3 +484,11 @@
 [DECISION] Luke committed to helping Jose with ongoing work
 [PERSONAL] Jose acknowledges he hasn't been consistent but is now fully committed and "locked in" to finish what they started together
 [FACT] Luke has done real work on Zekka and setter-related projects
+
+### 2026-04-30 14:07 UTC
+[DECISION] Luke is declining a six-week camp commitment with Martin due to scheduling conflicts that came up
+[DECISION] Jose advised Luke to either make a clean exit or offer specific help (May-early June for training) instead of leaving vague "when I'm around" language
+[TASK] Luke should send the final draft to Martin on Thursday at 9am
+[TASK] Luke should show the letter to his parents Thursday evening after Martin reads it
+[PERSONAL] Luke is seeking Jose's feedback on how to respectfully decline the camp commitment while maintaining the relationship
+[PERSONAL] Jose is supporting Luke through this difficult communication and checking in on how he's feeling emotionally
