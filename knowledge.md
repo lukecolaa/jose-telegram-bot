@@ -475,3 +475,7 @@
 [TASK] Send honest message to Martin Thursday 9am letting him know about the conflict early so he can find replacement coverage
 [TASK] Hand letter to parents Thursday evening after Martin reads it
 [PERSONAL] Luke values being straight with people and respecting their time rather than leaving them scrambled last-minute
+
+### 2026-04-30 14:05 UTC
+[TASK] Luke asked Jose to add to a sentence Luke previously requested, not create new messages
+[DECISION] Luke prefers Jose to expand existing work rather than start fresh
