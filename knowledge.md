@@ -443,3 +443,9 @@
 [TASK] Send the message to Martin Thursday morning at 9am
 [TASK] Hand the letter to parents Thursday evening after sending to Martin
 [PERSONAL] Luke is concerned about disappointing Martin but taking accountability for the constraint that came up
+
+### 2026-04-30 13:59 UTC
+[PERSONAL] Luke considering helping Martin with coaching during weeks he's not away (World Cup trip mid-summer) — offering flexibility instead of rejecting full 6-week contract
+[FACT] Luke has World Cup trip planned mid-summer
+[FACT] Potential coaching commitment would be ~4 weeks (May-June), 10 hours/week ($200/week), Tuesday/Thursday 9-11am + training time
+[GOAL] Luke needs to balance coaching commitment against: daily setter calls, Envista ads monitoring, Zekka cold outreach, closing at least one deal before mid-June
