@@ -464,3 +464,8 @@
 [DECISION] Luke is declining a 6-week camp commitment due to a family trip mid-summer (World Cup week with mom and Brazilian family)
 [DECISION] Luke wants to communicate this to Martin in a warm, grateful tone rather than defensive or arrogant — Jose provided a revised version that leads with appreciation and explains the specific conflict
 [TASK] Luke should send the message to Martin Thursday morning
+
+### 2026-04-30 14:03 UTC
+[DECISION] Luke can't honor the six-week camp commitment due to a non-negotiable family trip mid-summer (World Cup week with mom and family)
+[TASK] Send revised message to Martin about camp conflict—Jose helped tighten it to be specific, respectful, and firm without leaving negotiation room; timing: Thursday morning around 9am
+[PERSONAL] Luke values Martin's mentorship over the years and feels responsibility for not thinking through summer timeline earlier when committing to camp
