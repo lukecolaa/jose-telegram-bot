@@ -469,3 +469,9 @@
 [DECISION] Luke can't honor the six-week camp commitment due to a non-negotiable family trip mid-summer (World Cup week with mom and family)
 [TASK] Send revised message to Martin about camp conflict—Jose helped tighten it to be specific, respectful, and firm without leaving negotiation room; timing: Thursday morning around 9am
 [PERSONAL] Luke values Martin's mentorship over the years and feels responsibility for not thinking through summer timeline earlier when committing to camp
+
+### 2026-04-30 14:05 UTC
+[DECISION] Luke committed to summer camp but has a non-negotiable family trip mid-summer (week with mom and Brazilian family for World Cup) that conflicts with camp's no-trips policy
+[TASK] Send honest message to Martin Thursday 9am letting him know about the conflict early so he can find replacement coverage
+[TASK] Hand letter to parents Thursday evening after Martin reads it
+[PERSONAL] Luke values being straight with people and respecting their time rather than leaving them scrambled last-minute
