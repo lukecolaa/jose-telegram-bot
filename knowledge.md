@@ -454,3 +454,8 @@
 [DECISION] Luke has a World Cup trip mid-summer that conflicts with Martin's 6-week no-trips requirement — decided NOT to offer partial help ("help when not away") because it creates confusion and sets up future disappointment
 [IDEA] Jose recommended honest, direct approach: tell Martin upfront about the conflict, respect his 6-week commitment, and let Martin decide if he wants to counter-offer with specific dates instead
 [TASK] Send Martin a clean, no-wiggle-room message Thursday 9am declining the 6-week commitment due to immovable mid-summer travel plans
+
+### 2026-04-30 14:01 UTC
+[FACT] Luke knows Martin and believes he might accept a one-week absence mid-summer
+[DECISION] Luke needs to clarify whether Martin is genuinely flexible or if he's hoping Martin will be — Jose pushing him to be honest about the difference
+[TASK] If confident: message Martin Thursday with the constraint upfront ("non-negotiable family trip mid-summer for a week") and let Martin decide yes/no rather than negotiating down
