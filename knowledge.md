@@ -421,3 +421,10 @@
 ### 2026-04-30 01:25 UTC
 [FACT] Luke has completed work on a Claude terminal project
 [DECISION] Luke considers the Claude terminal project finished (status unclear if successful completion or abandoned)
+
+### 2026-04-30 13:46 UTC
+[DECISION] Luke is breaking a 6-week summer coaching commitment with Martin due to a non-negotiable World Cup trip mid-summer that conflicts directly with the terms
+[TASK] Send letter to Martin Thursday morning at 9am via text to give him time to find a replacement while he's still in Czech
+[TASK] Hand letter to Luke's parents Thursday evening after Martin reads it
+[PERSONAL] Luke has a family World Cup trip mid-summer that's non-negotiable
+[GOAL] Maintain Martin as a friend and mentor rather than complicate the relationship with a half-commitment
