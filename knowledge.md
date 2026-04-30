@@ -492,3 +492,10 @@
 [TASK] Luke should show the letter to his parents Thursday evening after Martin reads it
 [PERSONAL] Luke is seeking Jose's feedback on how to respectfully decline the camp commitment while maintaining the relationship
 [PERSONAL] Jose is supporting Luke through this difficult communication and checking in on how he's feeling emotionally
+
+### 2026-04-30 15:34 UTC
+[FACT] Martin responded to Luke's World Cup conflict by saying they'll figure it out when he arrives (mid-May)
+[FACT] Luke gave Martin 6+ weeks notice about the scheduling conflict
+[PERSONAL] Jose's assessment: Martin respecting Luke enough for face-to-face conversation rather than rejecting over text; this suggests openness to problem-solving
+[TASK] When Martin arrives, Luke should come prepared with: exact World Cup trip dates, specific offer (weeks available or partial commitment), and respect for Martin's decision
+[TASK] Luke should continue momentum on Zekka + setter work and cold outreach while waiting for in-person conversation with Martin
