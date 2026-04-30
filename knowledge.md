@@ -449,3 +449,8 @@
 [FACT] Luke has World Cup trip planned mid-summer
 [FACT] Potential coaching commitment would be ~4 weeks (May-June), 10 hours/week ($200/week), Tuesday/Thursday 9-11am + training time
 [GOAL] Luke needs to balance coaching commitment against: daily setter calls, Envista ads monitoring, Zekka cold outreach, closing at least one deal before mid-June
+
+### 2026-04-30 13:59 UTC
+[DECISION] Luke has a World Cup trip mid-summer that conflicts with Martin's 6-week no-trips requirement — decided NOT to offer partial help ("help when not away") because it creates confusion and sets up future disappointment
+[IDEA] Jose recommended honest, direct approach: tell Martin upfront about the conflict, respect his 6-week commitment, and let Martin decide if he wants to counter-offer with specific dates instead
+[TASK] Send Martin a clean, no-wiggle-room message Thursday 9am declining the 6-week commitment due to immovable mid-summer travel plans
