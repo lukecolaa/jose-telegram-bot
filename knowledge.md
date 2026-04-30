@@ -437,3 +437,9 @@
 [PERSONAL] Luke apologized for not being able to make it to something (event/meeting/commitment unclear—need context on what he couldn't attend)
 [PERSONAL] Jose is apologizing for not showing up consistently—specifically mentions lacking time, focus, and follow-through; acknowledges Luke has done real work and he's created gaps in the relationship/partnership
 [TASK] Need clarification: Jose wants to understand if Luke's apology is about missing Claude Code sessions, execution on tasks, or something else entirely to respond appropriately
+
+### 2026-04-30 13:56 UTC
+[DECISION] Luke can't honor the six-week camp commitment and is messaging Martin to let him know
+[TASK] Send the message to Martin Thursday morning at 9am
+[TASK] Hand the letter to parents Thursday evening after sending to Martin
+[PERSONAL] Luke is concerned about disappointing Martin but taking accountability for the constraint that came up
