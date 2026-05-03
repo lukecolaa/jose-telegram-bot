@@ -499,3 +499,10 @@
 [PERSONAL] Jose's assessment: Martin respecting Luke enough for face-to-face conversation rather than rejecting over text; this suggests openness to problem-solving
 [TASK] When Martin arrives, Luke should come prepared with: exact World Cup trip dates, specific offer (weeks available or partial commitment), and respect for Martin's decision
 [TASK] Luke should continue momentum on Zekka + setter work and cold outreach while waiting for in-person conversation with Martin
+
+### 2026-05-03 15:37 UTC
+[PERSONAL] Luke told parents about business (course, online network, Zekka) — they rejected it hard, called course fake, said online connections aren't real, demanded he choose between business and college
+[PERSONAL] Argument escalated before scheduled coach call, Luke missed it, conflict continued next morning at home
+[PERSONAL] Luke believes telling parents was a mistake; relationship currently strained
+[DECISION] Jose's advice: stop arguing/convincing parents, let revenue results speak instead — revenue is only proof that will move the needle with them
+[FACT] Luke has setter commission structure (20%, 70% closer rate), Envista ad campaign ready, and summer runway before USD to generate proof of concept
