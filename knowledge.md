@@ -529,3 +529,7 @@
 [FACT] Competitors being researched: Joyce, Medina Auto Mall, DeMontrond
 [IDEA] Winning ad formats to test: price grids, single model spotlights, $0 down/sign & drive, lifestyle carousels with pricing hooks, urgency, authority, retargeting angles
 [GOAL] Get leads and test drives for slow inventory; use competitive examples to pitch strategy to dad
+
+### 2026-05-04 17:25 UTC
+[DECISION] Luke prefers alternative to current method for sending something; exploring Telegram, Email, Discord, or other options
+[TASK] Jose will communicate Luke's preferred delivery method to Shea
