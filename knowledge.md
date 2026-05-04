@@ -522,3 +522,10 @@
 [GOAL] Generate early ad results/leads to build credibility with parents before approaching debt conversation
 [FACT] School ends May 20 - about 2 weeks to build campaign momentum before summer
 [DECISION] Approach dad about campaign separately first, don't mention Martin/Cancun/debt payoff yet
+
+### 2026-05-04 17:24 UTC
+[TASK] Luke requested winning ads pulled for Envista Sport Touring launch at Colandrea
+[FACT] Budget is $50-60/day test, targeting Hudson Valley (25-65), car shopping intent
+[FACT] Competitors being researched: Joyce, Medina Auto Mall, DeMontrond
+[IDEA] Winning ad formats to test: price grids, single model spotlights, $0 down/sign & drive, lifestyle carousels with pricing hooks, urgency, authority, retargeting angles
+[GOAL] Get leads and test drives for slow inventory; use competitive examples to pitch strategy to dad
