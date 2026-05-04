@@ -506,3 +506,8 @@
 [PERSONAL] Luke believes telling parents was a mistake; relationship currently strained
 [DECISION] Jose's advice: stop arguing/convincing parents, let revenue results speak instead — revenue is only proof that will move the needle with them
 [FACT] Luke has setter commission structure (20%, 70% closer rate), Envista ad campaign ready, and summer runway before USD to generate proof of concept
+
+### 2026-05-04 14:20 UTC
+[PERSONAL] Luke's mom expressed pride in him getting into his dream college and becoming a responsible, caring person; she's been thinking about him since childhood ("Patty Cakes")
+[PERSONAL] Luke initially misread his mom's message as being about his brother Martin, but Jose helped him recognize it was his mom reaching out with genuine love and pride in *who he is* as a person, not just his accomplishments
+[IDEA] Jose advised Luke to lead with this foundation of love when approaching a conversation with his mom about Martin — her reaching out first with pride changes the dynamic of that conversation
