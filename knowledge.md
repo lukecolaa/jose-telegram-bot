@@ -537,3 +537,6 @@
 ### 2026-05-04 17:25 UTC
 [FACT] Shea will send winning ads to Luke via Telegram within the hour
 [FACT] Shea has Luke's number from the system
+
+### 2026-05-05 12:17 UTC
+[DECISION] Luke doesn't want a 7:30 message this morning
