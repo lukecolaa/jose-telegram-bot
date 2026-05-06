@@ -540,3 +540,8 @@
 
 ### 2026-05-05 12:17 UTC
 [DECISION] Luke doesn't want a 7:30 message this morning
+
+### 2026-05-06 14:00 UTC
+[FACT] Luke had a call with Khari from Country Side Staples (streetwear brand)
+[TASK] Luke needs to request content/product photos from Khari for ad creatives — targeting 3-5 images (product shots or lifestyle wear)
+[GOAL] Luke is running an ad test campaign with Country Side Staples, aiming to launch by end of week to collect conversion data
