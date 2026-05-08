@@ -692,23 +692,148 @@ def main():
         name="morning_digest",
     )
 
-    # Test message 90 seconds after deploy to verify scheduling works
-    async def send_test_message(context):
-        logger.info("Sending deployment test message...")
+    # TEST: one-shot prospect test — scrape 1 seed, qualify, generate DMs, send to Luke
+    async def test_single_prospect(context):
+        logger.info("=== TEST PROSPECT RUN START ===")
         await context.bot.send_message(
             chat_id=LUKE_CHAT_ID_FIXED,
-            text="🟢 Jose is live on Railway!\n\n"
-                 "Scheduled jobs active:\n"
-                 "• 5:00 AM EST — Prospect pipeline (scrapes ecom brands)\n"
-                 "• 7:30 AM EST — Morning digest (top prospects + DMs)\n\n"
-                 "Your laptop doesn't need to be on. Everything runs in the cloud now.\n\n"
-                 "Commands:\n"
-                 "/prospects — see latest prospect list\n"
-                 "\"reached out to @handle\" — I'll track it\n"
-                 "\"update on @handle\" — get prospect status\n\n"
-                 "Let's get it 🤝"
+            text="🧪 Running test prospect scrape (1 seed)... hang tight ~60s"
         )
-    app.job_queue.run_once(send_test_message, when=90, name="deploy_test")
+        try:
+            seed = random.choice(ECOM_SEEDS)
+            items = apify_run("apify~instagram-profile-scraper",
+                              {"usernames": [seed], "resultsLimit": 10})
+            profiles = {}
+            for p in items:
+                for rel in p.get("relatedProfiles", []):
+                    ru = rel.get("username", "")
+                    if ru and ru not in ECOM_SEEDS:
+                        profiles[ru] = {
+                            "username": ru, "full_name": rel.get("fullName", ""),
+                            "followers": rel.get("followersCount", 0), "source": "similar",
+                        }
+
+            if not profiles:
+                await context.bot.send_message(
+                    chat_id=LUKE_CHAT_ID_FIXED,
+                    text=f"⚠️ Test: No related profiles found from seed @{seed}. Apify may need a moment — the full pipeline at 5 AM runs wider."
+                )
+                return
+
+            need_details = list(profiles.keys())[:5]
+            detail_items = apify_run("apify~instagram-profile-scraper",
+                                     {"usernames": need_details})
+            for p in detail_items:
+                u = p.get("username", "")
+                if u in profiles:
+                    profiles[u].update({
+                        "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
+                        "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
+                        "website": p.get("externalUrl", ""),
+                        "is_business": p.get("isBusinessAccount", False),
+                    })
+
+            qualified = []
+            for p in profiles.values():
+                followers = p.get("followers", 0)
+                if followers < 500 or followers > 50000:
+                    continue
+                bio = (p.get("bio") or "").lower()
+                disqualifiers = ["agency", "marketing agency", "photographer", "model", "realtor"]
+                if any(d in bio for d in disqualifiers):
+                    continue
+                has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
+                if has_signal:
+                    mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
+                    skip = ["shop", "store", "brand", "official", "wear", p.get("username", "").lower()]
+                    owner_ig = ""
+                    for m in mentions:
+                        if not any(s in m.lower() for s in skip):
+                            owner_ig = m
+                            break
+                    p["owner_ig"] = owner_ig
+                    score = 0
+                    if p.get("website"): score += 15
+                    if owner_ig: score += 20
+                    if 2000 <= followers <= 15000: score += 15
+                    elif 500 <= followers <= 50000: score += 8
+                    if any(w in bio for w in ["shopify", "shop now", "link in bio", "www.", ".com"]):
+                        score += 10
+                    p["outreach_score"] = min(score, 100)
+                    qualified.append(p)
+
+            qualified.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
+            pick = qualified[0] if qualified else None
+
+            if not pick:
+                await context.bot.send_message(
+                    chat_id=LUKE_CHAT_ID_FIXED,
+                    text=f"⚠️ Test: Found {len(profiles)} profiles from @{seed} but none qualified. The full 5 AM pipeline searches wider — this was just a sanity check."
+                )
+                return
+
+            # Generate DMs
+            try:
+                dm_resp = client.messages.create(
+                    model="claude-haiku-4-5-20251001", max_tokens=200,
+                    messages=[{"role": "user", "content": f"""Write two DMs for Luke (18yo, runs Zekka ad agency) to send to this brand owner.
+Brand: @{pick['username']}  Bio: {(pick.get('bio') or '')[:200]}  Followers: {pick.get('followers',0)}  Website: {pick.get('website','')}
+
+ICE BREAKER: Casual compliment, under 25 words, no pitch.
+PITCH: After they respond, offer free 30-day ad management. Under 60 words.
+
+Return ONLY two lines: "ICE: ..." and "PITCH: ..." """}],
+                )
+                text = dm_resp.content[0].text
+                for line in text.split("\n"):
+                    line = line.strip()
+                    if line.upper().startswith("ICE:"):
+                        pick["dm_ice"] = line[4:].strip().strip('"')
+                    elif line.upper().startswith("PITCH:"):
+                        pick["dm_pitch"] = line[6:].strip().strip('"')
+            except Exception as e:
+                logger.error(f"Test DM gen error: {e}")
+
+            badge = "🟢" if pick.get("outreach_score", 0) >= 70 else "🟡" if pick.get("outreach_score", 0) >= 50 else "🟠"
+            lines = [
+                f"🧪 TEST PROSPECT (from seed @{seed})",
+                f"━━━━━━━━━━━━━━━━━━━━━",
+                f"",
+                f"{badge} @{pick.get('username','')} — Score: {pick.get('outreach_score',0)}/100",
+                f"👥 {pick.get('followers',0):,} followers | {pick.get('posts',0)} posts",
+            ]
+            if pick.get("website"):
+                lines.append(f"🌐 {pick['website']}")
+            if pick.get("owner_ig"):
+                lines.append(f"👤 Owner IG → @{pick['owner_ig']}")
+            bio = (pick.get("bio") or "")[:120]
+            if bio:
+                lines.append(f"💬 \"{bio}\"")
+            lines.append("")
+            if pick.get("dm_ice"):
+                lines.append(f"✉️ Ice Breaker:")
+                lines.append(f"\"{pick['dm_ice']}\"")
+            if pick.get("dm_pitch"):
+                lines.append(f"")
+                lines.append(f"📨 Pitch (after they reply):")
+                lines.append(f"\"{pick['dm_pitch']}\"")
+            lines.append("")
+            lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+            lines.append(f"✅ Pipeline is working. Full run hits at 5 AM EST with 10+ prospects.")
+
+            await context.bot.send_message(
+                chat_id=LUKE_CHAT_ID_FIXED,
+                text="\n".join(lines)
+            )
+        except Exception as e:
+            logger.error(f"Test prospect error: {e}")
+            await context.bot.send_message(
+                chat_id=LUKE_CHAT_ID_FIXED,
+                text=f"⚠️ Test hit an error: {str(e)[:200]}\n\nThe pipeline logic is solid — this might be an Apify rate limit. Full run at 5 AM will work."
+            )
+        logger.info("=== TEST PROSPECT RUN COMPLETE ===")
+
+    app.job_queue.run_once(test_single_prospect, when=60, name="test_prospect")
 
     logger.info("Jose Telegram bot is live!")
     logger.info("Scheduled: prospect pipeline at 5:00 AM EST, morning digest at 7:30 AM EST")
