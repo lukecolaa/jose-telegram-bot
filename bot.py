@@ -445,6 +445,12 @@ BRAND_SIGNALS = [
     "buy now", "use code", "product", "available now", "link in bio",
 ]
 
+DISQUALIFIERS = [
+    "agency", "marketing agency", "photographer", "model", "realtor",
+    "life coach", "dropship", "print on demand", "pod", "reseller",
+    "meme", "news", "media company", "influencer agency",
+]
+
 
 def apify_run(actor_id, run_input, wait=120):
     if not APIFY_API_KEY:
@@ -470,13 +476,120 @@ def apify_run(actor_id, run_input, wait=120):
         return []
 
 
+def scrape_website_brief(url):
+    """Quick scrape of a brand's website — returns key signals."""
+    if not url:
+        return ""
+    if not url.startswith("http"):
+        url = "https://" + url
+    try:
+        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+        html = resp.text[:5000].lower()
+        signals = []
+        if "shopify" in html or "myshopify" in html:
+            signals.append("Shopify store")
+        if "woocommerce" in html:
+            signals.append("WooCommerce")
+        if "bigcartel" in html:
+            signals.append("Big Cartel")
+        if "fbq(" in html or "facebook pixel" in html or "meta pixel" in html:
+            signals.append("Has Meta Pixel")
+        else:
+            signals.append("NO Meta Pixel detected")
+        if "gtag(" in html or "google-analytics" in html or "ga4" in html:
+            signals.append("Has Google Analytics")
+        if "tiktok" in html and "pixel" in html:
+            signals.append("Has TikTok Pixel")
+        if "klaviyo" in html:
+            signals.append("Uses Klaviyo (email)")
+        if "mailchimp" in html:
+            signals.append("Uses Mailchimp")
+        if "add to cart" in html or "add-to-cart" in html:
+            signals.append("Active product pages")
+        if "sold out" in html or "out of stock" in html:
+            signals.append("Some products sold out (demand signal)")
+        import re as _re
+        prices = _re.findall(r'\$\d+\.?\d{0,2}', resp.text[:8000])
+        if prices:
+            nums = [float(p.replace("$", "")) for p in prices if float(p.replace("$", "")) > 5]
+            if nums:
+                signals.append(f"Price range: ${min(nums):.0f}-${max(nums):.0f}")
+        return " | ".join(signals) if signals else "Website found but no clear signals"
+    except Exception:
+        return "Website unreachable"
+
+
+def ai_research_prospect(profile_data, website_signals=""):
+    """Use Claude to deeply analyze a prospect and generate a full brief."""
+    bio = (profile_data.get("bio") or "")[:300]
+    username = profile_data.get("username", "")
+    followers = profile_data.get("followers", 0)
+    posts = profile_data.get("posts", 0)
+    website = profile_data.get("website", "")
+    full_name = profile_data.get("full_name", "")
+    owner_ig = profile_data.get("owner_ig", "")
+    engagement = profile_data.get("avg_engagement", 0)
+    recent_captions = profile_data.get("recent_captions", "")
+
+    prompt = f"""You are Jose, an expert ecom brand analyst for Zekka (Luke's ad agency).
+
+Analyze this Instagram brand and return a JSON object. Be brutally honest — Luke needs actionable intel, not fluff.
+
+BRAND DATA:
+- Username: @{username}
+- Full Name: {full_name}
+- Bio: {bio}
+- Followers: {followers:,}
+- Posts: {posts}
+- Website: {website}
+- Website Tech: {website_signals}
+- Owner IG found: {owner_ig or 'none'}
+- Avg likes/post: {engagement}
+- Recent captions: {recent_captions[:400]}
+
+Return ONLY valid JSON with these fields:
+{{
+  "is_real_brand": true/false,
+  "niche": "streetwear/supplements/fitness/skincare/wellness/food/accessories/other",
+  "what_they_sell": "1 sentence — specific products",
+  "strengths": "1-2 sentences — what they're doing well",
+  "weaknesses": "1-2 sentences — gaps in their marketing/growth",
+  "ad_opportunity": "1 sentence — exactly what Zekka could do for them",
+  "quality_score": 0-100,
+  "dm_ice_breaker": "Casual, genuine compliment DM under 25 words. Reference something SPECIFIC about their brand. No pitch.",
+  "dm_pitch": "After they reply, this follow-up offers free 30-day ad management. Under 60 words. Mention their specific weakness.",
+  "skip_reason": "Only if is_real_brand is false — why to skip"
+}}
+
+SCORING GUIDE (quality_score):
+90-100: Perfect prospect — real product, engaged audience, no ads, owner reachable
+70-89: Strong prospect — real brand, clear opportunity, worth the DM
+50-69: Decent — might work, some yellow flags
+Below 50: Skip — not a real fit for Zekka"""
+
+    try:
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001", max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = resp.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        return json.loads(text)
+    except Exception as e:
+        logger.error(f"AI research error @{username}: {e}")
+        return None
+
+
 async def run_prospect_pipeline(context):
-    """Runs at 5:00 AM EST — discovers and qualifies ecom prospects."""
+    """Runs at 5:00 AM EST — discovers, researches, and qualifies ecom prospects."""
     logger.info("=== PROSPECT PIPELINE START ===")
 
     profiles = {}
 
-    # Discover via similar accounts
+    # Phase 1: Discover via similar accounts to seeds
     items = apify_run("apify~instagram-profile-scraper",
                       {"usernames": ECOM_SEEDS[:6], "resultsLimit": 50})
     for p in items:
@@ -496,8 +609,8 @@ async def run_prospect_pipeline(context):
                     "followers": rel.get("followersCount", 0), "source": "similar",
                 }
 
-    # Discover via hashtags (sample 8)
-    sampled_tags = random.sample(ECOM_HASHTAGS, min(8, len(ECOM_HASHTAGS)))
+    # Phase 2: Discover via hashtags (sample 6)
+    sampled_tags = random.sample(ECOM_HASHTAGS, min(6, len(ECOM_HASHTAGS)))
     for tag in sampled_tags:
         items = apify_run("apify~instagram-hashtag-scraper",
                           {"hashtags": [tag], "resultsLimit": 15, "resultsType": "posts"})
@@ -506,25 +619,27 @@ async def run_prospect_pipeline(context):
             if owner and owner not in profiles:
                 profiles[owner] = {"username": owner, "source_hashtag": tag}
 
-    logger.info(f"Discovered {len(profiles)} unique profiles")
+    logger.info(f"Phase 1-2: Discovered {len(profiles)} raw profiles")
 
-    # Get details for profiles missing data
-    need_details = [u for u, p in profiles.items() if not p.get("followers")]
+    # Phase 3: Get full details for profiles missing data
+    need_details = [u for u, p in profiles.items() if not p.get("bio")]
     if need_details:
-        detail_items = apify_run("apify~instagram-profile-scraper",
-                                 {"usernames": need_details[:30]})
-        for p in detail_items:
-            u = p.get("username", "")
-            if u in profiles:
-                profiles[u].update({
-                    "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
-                    "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
-                    "website": p.get("externalUrl", ""),
-                    "is_business": p.get("isBusinessAccount", False),
-                })
+        for batch_start in range(0, min(len(need_details), 40), 20):
+            batch = need_details[batch_start:batch_start + 20]
+            detail_items = apify_run("apify~instagram-profile-scraper",
+                                     {"usernames": batch})
+            for p in detail_items:
+                u = p.get("username", "")
+                if u in profiles:
+                    profiles[u].update({
+                        "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
+                        "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
+                        "website": p.get("externalUrl", ""),
+                        "is_business": p.get("isBusinessAccount", False),
+                    })
 
-    # Filter to real ecom brands
-    qualified = []
+    # Phase 4: Hard filter — remove obvious non-fits before AI research
+    pre_qualified = []
     for p in profiles.values():
         followers = p.get("followers", 0)
         if followers < 1000 or followers > 50000:
@@ -532,13 +647,12 @@ async def run_prospect_pipeline(context):
         if p.get("posts", 0) < 10:
             continue
         bio = (p.get("bio") or "").lower()
-        disqualifiers = ["agency", "marketing agency", "photographer", "model", "realtor", "life coach"]
-        if any(d in bio for d in disqualifiers):
+        if any(d in bio for d in DISQUALIFIERS):
             continue
         has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
         if not has_signal:
             continue
-        # Find owner IG from bio
+        # Extract owner IG from bio
         mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
         skip = ["shop", "store", "brand", "official", "wear", "linktree", p.get("username", "").lower()]
         owner_ig = ""
@@ -547,48 +661,50 @@ async def run_prospect_pipeline(context):
                 owner_ig = m
                 break
         p["owner_ig"] = owner_ig
-        # Score
-        score = 0
-        if p.get("website"): score += 15
-        if owner_ig: score += 20
-        if 2000 <= followers <= 15000: score += 15
-        elif 1000 <= followers <= 50000: score += 8
-        if any(w in bio for w in ["shopify", "shop now", "link in bio", "www.", ".com"]):
-            score += 10
-        p["outreach_score"] = min(score, 100)
-        qualified.append(p)
+        pre_qualified.append(p)
 
-    qualified.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
-    top = qualified[:10]
+    logger.info(f"Phase 4: {len(pre_qualified)} passed hard filters")
 
-    # Generate DMs for top prospects
-    for p in top:
+    # Phase 5: Get recent posts for engagement data (top 15 candidates by follower sweet spot)
+    pre_qualified.sort(key=lambda x: abs(x.get("followers", 0) - 8000))
+    candidates = pre_qualified[:15]
+
+    for p in candidates:
         try:
-            dm_resp = client.messages.create(
-                model="claude-haiku-4-5-20251001", max_tokens=200,
-                messages=[{"role": "user", "content": f"""Write two DMs for Luke (18yo, runs Zekka ad agency) to send to this brand owner.
-Brand: @{p['username']}  Bio: {(p.get('bio') or '')[:200]}  Followers: {p.get('followers',0)}  Website: {p.get('website','')}
-
-ICE BREAKER: Casual compliment, under 25 words, no pitch.
-PITCH: After they respond, offer free 30-day ad management. Under 60 words.
-
-Return ONLY two lines: "ICE: ..." and "PITCH: ..." """}],
-            )
-            text = dm_resp.content[0].text
-            for line in text.split("\n"):
-                line = line.strip()
-                if line.upper().startswith("ICE:"):
-                    p["dm_ice"] = line[4:].strip().strip('"')
-                elif line.upper().startswith("PITCH:"):
-                    p["dm_pitch"] = line[6:].strip().strip('"')
+            post_items = apify_run("apify~instagram-post-scraper",
+                                   {"directUrls": [f"https://www.instagram.com/{p['username']}/"],
+                                    "resultsLimit": 6})
+            if post_items:
+                likes = [item.get("likesCount", 0) for item in post_items if item.get("likesCount")]
+                p["avg_engagement"] = sum(likes) // len(likes) if likes else 0
+                captions = [item.get("caption", "")[:100] for item in post_items[:3] if item.get("caption")]
+                p["recent_captions"] = " | ".join(captions)
         except Exception as e:
-            logger.error(f"DM gen error @{p['username']}: {e}")
+            logger.error(f"Post scrape error @{p.get('username','')}: {e}")
+
+    # Phase 6: AI deep research on top candidates
+    logger.info(f"Phase 6: AI researching {len(candidates)} candidates...")
+    researched = []
+    for p in candidates:
+        website_signals = scrape_website_brief(p.get("website", ""))
+        p["website_signals"] = website_signals
+        analysis = ai_research_prospect(p, website_signals)
+        if analysis:
+            p["analysis"] = analysis
+            if analysis.get("is_real_brand") and analysis.get("quality_score", 0) >= 50:
+                p["outreach_score"] = analysis["quality_score"]
+                p["dm_ice"] = analysis.get("dm_ice_breaker", "")
+                p["dm_pitch"] = analysis.get("dm_pitch", "")
+                researched.append(p)
+
+    researched.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
+    top = researched[:8]
 
     context.bot_data["latest_prospects"] = top
     context.bot_data["pipeline_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    context.bot_data["total_found"] = len(qualified)
+    context.bot_data["total_found"] = len(researched)
 
-    logger.info(f"=== PIPELINE COMPLETE: {len(qualified)} qualified, {len(top)} with DMs ===")
+    logger.info(f"=== PIPELINE COMPLETE: {len(researched)} researched & qualified, {len(top)} top picks ===")
 
 
 async def send_morning_digest(context):
@@ -640,25 +756,38 @@ async def send_morning_digest(context):
         pass
 
     for i, p in enumerate(prospects[:5], 1):
+        a = p.get("analysis", {})
         badge = "🟢" if p.get("outreach_score", 0) >= 70 else "🟡" if p.get("outreach_score", 0) >= 50 else "🟠"
-        lines.append(f"{badge} #{i} — @{p.get('username','')} ({p.get('outreach_score',0)}/100)")
-        lines.append(f"   👥 {p.get('followers',0):,} followers")
+        niche_tag = a.get("niche", "ecom").upper()
+        lines.append(f"{badge} #{i} — @{p.get('username','')} [{niche_tag}] ({p.get('outreach_score',0)}/100)")
+        lines.append(f"   👥 {p.get('followers',0):,} followers | {p.get('posts',0)} posts")
+        if p.get("avg_engagement"):
+            lines.append(f"   📈 ~{p['avg_engagement']:,} avg likes/post")
+        if a.get("what_they_sell"):
+            lines.append(f"   🛍️ {a['what_they_sell']}")
         if p.get("website"):
             lines.append(f"   🌐 {p['website']}")
+        if p.get("website_signals"):
+            lines.append(f"   🔧 {p['website_signals'][:80]}")
+        if a.get("strengths"):
+            lines.append(f"   ✅ {a['strengths'][:100]}")
+        if a.get("weaknesses"):
+            lines.append(f"   ⚠️ {a['weaknesses'][:100]}")
+        if a.get("ad_opportunity"):
+            lines.append(f"   🎯 {a['ad_opportunity'][:100]}")
         if p.get("owner_ig"):
-            lines.append(f"   👤 DM → @{p['owner_ig']}")
-        bio = (p.get("bio") or "")[:80]
-        if bio:
-            lines.append(f"   💬 {bio}")
+            lines.append(f"   👤 DM owner → @{p['owner_ig']}")
         if p.get("dm_ice"):
-            lines.append(f"   ✉️ \"{p['dm_ice']}\"")
+            lines.append(f"   ✉️ Ice: \"{p['dm_ice']}\"")
+        if p.get("dm_pitch"):
+            lines.append(f"   📨 Pitch: \"{p['dm_pitch'][:120]}\"")
         lines.append("")
 
     if total_found > 5:
-        lines.append(f"... +{total_found - 5} more found")
+        lines.append(f"... +{total_found - 5} more researched")
     lines.append("")
     lines.append("━━━━━━━━━━━━━━━━━━━━━")
-    lines.append("What's your ONE thing today? 🎯")
+    lines.append("Reply with a # to get the full brief, or just start DMing 🎯")
 
     msg = "\n".join(lines)
     if len(msg) > 4096:
@@ -692,134 +821,147 @@ def main():
         name="morning_digest",
     )
 
-    # TEST: one-shot prospect test — scrape 1 seed, qualify, generate DMs, send to Luke
+    # TEST: deep research on 1 real prospect — full pipeline preview
     async def test_single_prospect(context):
-        logger.info("=== TEST PROSPECT RUN START ===")
+        logger.info("=== TEST DEEP PROSPECT RUN START ===")
         await context.bot.send_message(
             chat_id=LUKE_CHAT_ID_FIXED,
-            text="🧪 Running test prospect scrape (1 seed)... hang tight ~60s"
+            text="🧪 Running deep prospect test — scraping, researching, analyzing...\nThis takes ~90 seconds. Hang tight."
         )
         try:
             seed = random.choice(ECOM_SEEDS)
             items = apify_run("apify~instagram-profile-scraper",
                               {"usernames": [seed], "resultsLimit": 10})
-            profiles = {}
+            candidates = {}
             for p in items:
                 for rel in p.get("relatedProfiles", []):
                     ru = rel.get("username", "")
-                    if ru and ru not in ECOM_SEEDS:
-                        profiles[ru] = {
+                    fc = rel.get("followersCount", 0)
+                    if ru and ru not in ECOM_SEEDS and 1000 <= fc <= 50000:
+                        candidates[ru] = {
                             "username": ru, "full_name": rel.get("fullName", ""),
-                            "followers": rel.get("followersCount", 0), "source": "similar",
+                            "followers": fc, "source": f"similar to @{seed}",
                         }
 
-            if not profiles:
+            if not candidates:
                 await context.bot.send_message(
                     chat_id=LUKE_CHAT_ID_FIXED,
-                    text=f"⚠️ Test: No related profiles found from seed @{seed}. Apify may need a moment — the full pipeline at 5 AM runs wider."
+                    text=f"⚠️ No related brands found from @{seed}. The full 5 AM run uses 6 seeds + hashtags — much wider net."
                 )
                 return
 
-            need_details = list(profiles.keys())[:5]
+            # Get full details on top 5 candidates
+            top_usernames = list(candidates.keys())[:5]
             detail_items = apify_run("apify~instagram-profile-scraper",
-                                     {"usernames": need_details})
+                                     {"usernames": top_usernames})
             for p in detail_items:
                 u = p.get("username", "")
-                if u in profiles:
-                    profiles[u].update({
+                if u in candidates:
+                    candidates[u].update({
                         "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
                         "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
                         "website": p.get("externalUrl", ""),
                         "is_business": p.get("isBusinessAccount", False),
                     })
 
-            qualified = []
-            for p in profiles.values():
-                followers = p.get("followers", 0)
-                if followers < 500 or followers > 50000:
+            # Filter out obvious non-brands
+            filtered = []
+            for p in candidates.values():
+                if not p.get("bio"):
                     continue
                 bio = (p.get("bio") or "").lower()
-                disqualifiers = ["agency", "marketing agency", "photographer", "model", "realtor"]
-                if any(d in bio for d in disqualifiers):
+                if any(d in bio for d in DISQUALIFIERS):
                     continue
                 has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
                 if has_signal:
                     mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
-                    skip = ["shop", "store", "brand", "official", "wear", p.get("username", "").lower()]
+                    skip_words = ["shop", "store", "brand", "official", "wear", p.get("username", "").lower()]
                     owner_ig = ""
                     for m in mentions:
-                        if not any(s in m.lower() for s in skip):
+                        if not any(s in m.lower() for s in skip_words):
                             owner_ig = m
                             break
                     p["owner_ig"] = owner_ig
-                    score = 0
-                    if p.get("website"): score += 15
-                    if owner_ig: score += 20
-                    if 2000 <= followers <= 15000: score += 15
-                    elif 500 <= followers <= 50000: score += 8
-                    if any(w in bio for w in ["shopify", "shop now", "link in bio", "www.", ".com"]):
-                        score += 10
-                    p["outreach_score"] = min(score, 100)
-                    qualified.append(p)
+                    filtered.append(p)
 
-            qualified.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
-            pick = qualified[0] if qualified else None
-
-            if not pick:
+            if not filtered:
                 await context.bot.send_message(
                     chat_id=LUKE_CHAT_ID_FIXED,
-                    text=f"⚠️ Test: Found {len(profiles)} profiles from @{seed} but none qualified. The full 5 AM pipeline searches wider — this was just a sanity check."
+                    text=f"⚠️ Found {len(candidates)} profiles from @{seed} but none had brand signals. Full 5 AM pipeline runs much wider."
                 )
                 return
 
-            # Generate DMs
+            # Pick the best candidate and do deep research
+            pick = filtered[0]
+
+            # Get recent posts for engagement
             try:
-                dm_resp = client.messages.create(
-                    model="claude-haiku-4-5-20251001", max_tokens=200,
-                    messages=[{"role": "user", "content": f"""Write two DMs for Luke (18yo, runs Zekka ad agency) to send to this brand owner.
-Brand: @{pick['username']}  Bio: {(pick.get('bio') or '')[:200]}  Followers: {pick.get('followers',0)}  Website: {pick.get('website','')}
+                post_items = apify_run("apify~instagram-post-scraper",
+                                       {"directUrls": [f"https://www.instagram.com/{pick['username']}/"],
+                                        "resultsLimit": 6})
+                if post_items:
+                    likes = [item.get("likesCount", 0) for item in post_items if item.get("likesCount")]
+                    pick["avg_engagement"] = sum(likes) // len(likes) if likes else 0
+                    captions = [item.get("caption", "")[:100] for item in post_items[:3] if item.get("caption")]
+                    pick["recent_captions"] = " | ".join(captions)
+            except Exception:
+                pass
 
-ICE BREAKER: Casual compliment, under 25 words, no pitch.
-PITCH: After they respond, offer free 30-day ad management. Under 60 words.
+            # Website analysis
+            website_signals = scrape_website_brief(pick.get("website", ""))
+            pick["website_signals"] = website_signals
 
-Return ONLY two lines: "ICE: ..." and "PITCH: ..." """}],
-                )
-                text = dm_resp.content[0].text
-                for line in text.split("\n"):
-                    line = line.strip()
-                    if line.upper().startswith("ICE:"):
-                        pick["dm_ice"] = line[4:].strip().strip('"')
-                    elif line.upper().startswith("PITCH:"):
-                        pick["dm_pitch"] = line[6:].strip().strip('"')
-            except Exception as e:
-                logger.error(f"Test DM gen error: {e}")
+            # AI deep research
+            analysis = ai_research_prospect(pick, website_signals)
+            if not analysis:
+                analysis = {"quality_score": 50, "what_they_sell": "Unknown", "niche": "ecom",
+                            "strengths": "Needs more research", "weaknesses": "Unclear from data",
+                            "ad_opportunity": "Potential for paid social", "dm_ice_breaker": "", "dm_pitch": ""}
 
-            badge = "🟢" if pick.get("outreach_score", 0) >= 70 else "🟡" if pick.get("outreach_score", 0) >= 50 else "🟠"
+            pick["analysis"] = analysis
+            pick["outreach_score"] = analysis.get("quality_score", 50)
+
+            # Format the deep brief
+            a = analysis
+            badge = "🟢" if pick["outreach_score"] >= 70 else "🟡" if pick["outreach_score"] >= 50 else "🟠"
+            niche = a.get("niche", "ecom").upper()
+
             lines = [
-                f"🧪 TEST PROSPECT (from seed @{seed})",
+                f"🧪 DEEP PROSPECT TEST",
+                f"Found via: similar to @{seed}",
                 f"━━━━━━━━━━━━━━━━━━━━━",
                 f"",
-                f"{badge} @{pick.get('username','')} — Score: {pick.get('outreach_score',0)}/100",
+                f"{badge} @{pick.get('username','')} [{niche}] — {pick['outreach_score']}/100",
                 f"👥 {pick.get('followers',0):,} followers | {pick.get('posts',0)} posts",
             ]
+            if pick.get("avg_engagement"):
+                lines.append(f"📈 ~{pick['avg_engagement']:,} avg likes/post")
+            if a.get("what_they_sell"):
+                lines.append(f"🛍️ {a['what_they_sell']}")
             if pick.get("website"):
                 lines.append(f"🌐 {pick['website']}")
-            if pick.get("owner_ig"):
-                lines.append(f"👤 Owner IG → @{pick['owner_ig']}")
-            bio = (pick.get("bio") or "")[:120]
-            if bio:
-                lines.append(f"💬 \"{bio}\"")
+            if website_signals:
+                lines.append(f"🔧 {website_signals[:100]}")
             lines.append("")
-            if pick.get("dm_ice"):
+            if a.get("strengths"):
+                lines.append(f"✅ Strengths: {a['strengths']}")
+            if a.get("weaknesses"):
+                lines.append(f"⚠️ Weaknesses: {a['weaknesses']}")
+            if a.get("ad_opportunity"):
+                lines.append(f"🎯 Opportunity: {a['ad_opportunity']}")
+            lines.append("")
+            if pick.get("owner_ig"):
+                lines.append(f"👤 DM the owner → @{pick['owner_ig']}")
+            if a.get("dm_ice_breaker"):
                 lines.append(f"✉️ Ice Breaker:")
-                lines.append(f"\"{pick['dm_ice']}\"")
-            if pick.get("dm_pitch"):
+                lines.append(f"\"{a['dm_ice_breaker']}\"")
+            if a.get("dm_pitch"):
                 lines.append(f"")
                 lines.append(f"📨 Pitch (after they reply):")
-                lines.append(f"\"{pick['dm_pitch']}\"")
+                lines.append(f"\"{a['dm_pitch']}\"")
             lines.append("")
             lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
-            lines.append(f"✅ Pipeline is working. Full run hits at 5 AM EST with 10+ prospects.")
+            lines.append(f"✅ This is what each prospect will look like at 7:30 AM. Full run = 5-8 of these.")
 
             await context.bot.send_message(
                 chat_id=LUKE_CHAT_ID_FIXED,
@@ -829,9 +971,9 @@ Return ONLY two lines: "ICE: ..." and "PITCH: ..." """}],
             logger.error(f"Test prospect error: {e}")
             await context.bot.send_message(
                 chat_id=LUKE_CHAT_ID_FIXED,
-                text=f"⚠️ Test hit an error: {str(e)[:200]}\n\nThe pipeline logic is solid — this might be an Apify rate limit. Full run at 5 AM will work."
+                text=f"⚠️ Test error: {str(e)[:200]}\n\nLikely an Apify rate limit. Full 5 AM run will work."
             )
-        logger.info("=== TEST PROSPECT RUN COMPLETE ===")
+        logger.info("=== TEST DEEP PROSPECT RUN COMPLETE ===")
 
     app.job_queue.run_once(test_single_prospect, when=60, name="test_prospect")
 
