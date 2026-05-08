@@ -829,24 +829,43 @@ def main():
             text="🧪 Running deep prospect test — scraping, researching, analyzing...\nThis takes ~90 seconds. Hang tight."
         )
         try:
-            seed = random.choice(ECOM_SEEDS)
-            items = apify_run("apify~instagram-profile-scraper",
-                              {"usernames": [seed], "resultsLimit": 10})
+            # Try multiple seeds until we find related profiles
             candidates = {}
-            for p in items:
-                for rel in p.get("relatedProfiles", []):
-                    ru = rel.get("username", "")
-                    fc = rel.get("followersCount", 0)
-                    if ru and ru not in ECOM_SEEDS and 1000 <= fc <= 50000:
-                        candidates[ru] = {
-                            "username": ru, "full_name": rel.get("fullName", ""),
-                            "followers": fc, "source": f"similar to @{seed}",
-                        }
+            used_seed = ""
+            shuffled_seeds = random.sample(ECOM_SEEDS, len(ECOM_SEEDS))
+            for seed in shuffled_seeds[:4]:
+                items = apify_run("apify~instagram-profile-scraper",
+                                  {"usernames": [seed], "resultsLimit": 10})
+                for p in items:
+                    for rel in p.get("relatedProfiles", []):
+                        ru = rel.get("username", "")
+                        fc = rel.get("followersCount", 0)
+                        if ru and ru not in ECOM_SEEDS and 1000 <= fc <= 50000:
+                            candidates[ru] = {
+                                "username": ru, "full_name": rel.get("fullName", ""),
+                                "followers": fc, "source": f"similar to @{seed}",
+                            }
+                if candidates:
+                    used_seed = seed
+                    break
+                logger.info(f"Test: no related profiles from @{seed}, trying next seed...")
+
+            # Fallback: try a hashtag if seeds fail
+            if not candidates:
+                tag = random.choice(ECOM_HASHTAGS)
+                logger.info(f"Test: seeds failed, trying hashtag #{tag}")
+                hash_items = apify_run("apify~instagram-hashtag-scraper",
+                                       {"hashtags": [tag], "resultsLimit": 20, "resultsType": "posts"})
+                for item in hash_items:
+                    owner = item.get("ownerUsername") or item.get("owner", {}).get("username", "")
+                    if owner:
+                        candidates[owner] = {"username": owner, "source": f"hashtag #{tag}"}
+                used_seed = f"#{tag}"
 
             if not candidates:
                 await context.bot.send_message(
                     chat_id=LUKE_CHAT_ID_FIXED,
-                    text=f"⚠️ No related brands found from @{seed}. The full 5 AM run uses 6 seeds + hashtags — much wider net."
+                    text="⚠️ Apify returned no profiles from any seed or hashtag. Might be a rate limit — the full 5 AM run will retry."
                 )
                 return
 
@@ -887,7 +906,7 @@ def main():
             if not filtered:
                 await context.bot.send_message(
                     chat_id=LUKE_CHAT_ID_FIXED,
-                    text=f"⚠️ Found {len(candidates)} profiles from @{seed} but none had brand signals. Full 5 AM pipeline runs much wider."
+                    text=f"⚠️ Found {len(candidates)} profiles from {used_seed} but none had brand signals. Full 5 AM pipeline runs much wider."
                 )
                 return
 
@@ -928,7 +947,7 @@ def main():
 
             lines = [
                 f"🧪 DEEP PROSPECT TEST",
-                f"Found via: similar to @{seed}",
+                f"Found via: {used_seed}",
                 f"━━━━━━━━━━━━━━━━━━━━━",
                 f"",
                 f"{badge} @{pick.get('username','')} [{niche}] — {pick['outreach_score']}/100",
