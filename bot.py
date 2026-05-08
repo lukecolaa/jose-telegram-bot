@@ -342,6 +342,29 @@ async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Memory cleared. Fresh start — but I still remember everything from past conversations.")
 
 
+async def prospects_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Manual trigger: /prospects — runs the full pipeline on demand."""
+    await update.message.reply_text(
+        "🔄 Running prospect pipeline now — scraping, researching, generating DMs...\n"
+        "This takes ~2-3 minutes. I'll send the digest when it's done."
+    )
+    try:
+        await run_prospect_pipeline(context)
+        prospects = context.bot_data.get("latest_prospects", [])
+        if prospects:
+            await send_morning_digest(context)
+        else:
+            await update.message.reply_text(
+                "⚠️ Pipeline ran but found no qualified prospects this round.\n"
+                "Could be an Apify rate limit. Try again in 10-15 mins, or I'll get them at 5 AM."
+            )
+    except Exception as e:
+        logger.error(f"/prospects command error: {e}")
+        await update.message.reply_text(
+            f"⚠️ Pipeline hit an error: {str(e)[:200]}\n\nTry again in a few minutes."
+        )
+
+
 # ── Prospect Tracking ────────────────────────────────────────────
 
 outreach_tracker = {}  # {handle: {status, notes, date}}
@@ -583,9 +606,9 @@ Below 50: Skip — not a real fit for Zekka"""
         return None
 
 
-async def run_prospect_pipeline(context):
+async def run_prospect_pipeline(context, is_retry=False):
     """Runs at 5:00 AM EST — discovers, researches, and qualifies ecom prospects."""
-    logger.info("=== PROSPECT PIPELINE START ===")
+    logger.info(f"=== PROSPECT PIPELINE START {'(RETRY)' if is_retry else ''} ===")
 
     profiles = {}
 
@@ -700,9 +723,39 @@ async def run_prospect_pipeline(context):
     researched.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
     top = researched[:8]
 
+    if top:
+        # Cache today's prospects as backup for tomorrow
+        context.bot_data["cached_prospects"] = top
+        context.bot_data["cached_total"] = len(researched)
+        context.bot_data["cached_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
     context.bot_data["latest_prospects"] = top
     context.bot_data["pipeline_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     context.bot_data["total_found"] = len(researched)
+
+    # If pipeline found nothing and this isn't already a retry, schedule retry in 1 hour
+    if not top and not is_retry:
+        logger.info("Pipeline found no prospects — scheduling retry in 1 hour")
+        try:
+            await context.bot.send_message(
+                chat_id=LUKE_CHAT_ID_FIXED,
+                text="⚠️ 5 AM pipeline came up empty (possible Apify rate limit). Auto-retrying in 1 hour. You can also run /prospects manually anytime."
+            )
+        except Exception:
+            pass
+        context.job_queue.run_once(
+            lambda ctx: run_prospect_pipeline(ctx, is_retry=True),
+            when=3600, name="prospect_retry",
+        )
+    elif not top and is_retry:
+        logger.info("Retry also found nothing")
+        try:
+            await context.bot.send_message(
+                chat_id=LUKE_CHAT_ID_FIXED,
+                text="⚠️ Pipeline retry also came up empty. Run /prospects later when you get a chance — Apify might need a cooldown."
+            )
+        except Exception:
+            pass
 
     logger.info(f"=== PIPELINE COMPLETE: {len(researched)} researched & qualified, {len(top)} top picks ===")
 
@@ -715,6 +768,13 @@ async def send_morning_digest(context):
     prospects = context.bot_data.get("latest_prospects", [])
     total_found = context.bot_data.get("total_found", 0)
     today = datetime.now(EST).strftime("%A, %B %d")
+    using_cache = False
+
+    # Fallback to yesterday's cached prospects if today's pipeline failed
+    if not prospects and context.bot_data.get("cached_prospects"):
+        prospects = context.bot_data["cached_prospects"]
+        total_found = context.bot_data.get("cached_total", 0)
+        using_cache = True
 
     if not prospects:
         greetings = ["Bom dia Luke!", "Rise and grind Luke!", "Aye Luke, let's get it!",
@@ -737,10 +797,13 @@ async def send_morning_digest(context):
         f"☀️ Bom dia Luke!",
         f"",
         f"📊 PROSPECT DIGEST — {today}",
-        f"━━━━━━━━━━━━━━━━━━━━━",
-        f"🟢 Elite: {elite} | 🟡 Good: {good} | Total scraped: {total_found}",
-        f"",
     ]
+    if using_cache:
+        cached_date = context.bot_data.get("cached_date", "yesterday")
+        lines.append(f"⚠️ Today's pipeline failed — showing {cached_date} prospects. Run /prospects for fresh ones.")
+    lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(f"🟢 Elite: {elite} | 🟡 Good: {good} | Total scraped: {total_found}")
+    lines.append("")
 
     # AI summary
     try:
@@ -805,6 +868,7 @@ def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("clear", clear))
+    app.add_handler(CommandHandler("prospects", prospects_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Schedule: prospect pipeline at 5:00 AM EST (10:00 UTC)
