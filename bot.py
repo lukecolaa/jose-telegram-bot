@@ -1,14 +1,18 @@
 import os
 import json
 import logging
+import re
+import random
 import base64
 import urllib.request
 import urllib.error
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, time as dtime
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import anthropic
+import requests
+import pytz
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,6 +21,9 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO = "lukecolaa/jose-telegram-bot"
+LUKE_CHAT_ID_FIXED = 6352126819
+APIFY_API_KEY = os.environ.get("APIFY_API_KEY", "")
+EST = pytz.timezone("US/Eastern")
 
 JOSE_SYSTEM_PROMPT = """You are Jose, Luke's AI co-founder and right hand at Zekka (a growth operations agency).
 
@@ -30,18 +37,18 @@ WHO LUKE IS:
 - 18 years old, finishing high school — last day May 20, 2026
 - Moving from NY to University of San Diego in August 2026
 - Brazilian-American (Brazilian mother, American father), speaks Portuguese
-- Building Zekka, a growth operations agency (ads, SEO, lead gen, ecom scaling, AI integration)
-- Currently working as a setter for a diesel growth business offer (20% commission, 70% closer rate)
-- Parents own Colandrea Buick GMC in Newburgh, NY — Zekka's FIRST REAL CLIENT (marketing is NOT corporate-controlled, Luke can run ads)
-- Owes his dad $3,500 by August 25 — plan is to run dealership ads for free to clear the debt (NOT YET PITCHED — waiting for right moment)
-- Has $1,585 cash, pays $200/mo car payment through August
-- Cancun networking trip is OFF — parents shut it down
-- Martin (tennis coach, family friend from Czech) has been told Luke can't do the summer coaching job — Martin said they'll resolve it when he returns from Czech
-- Parents are NOT supportive of the business vision right now — they called the course fake, said Luke is gullible, told him to choose between business and college. Things are tense at home. DO NOT bring this up unless Luke does. Just be supportive and help him execute.
-- The play: stop arguing with parents, let results (revenue) do the talking
+- Building Zekka, an ecom ad creative + media buying agency
+- First client: Colandrea Buick GMC (family dealership — stays forever, Rick is interested in Luke running ads)
+- Targeting DTC/Shopify brands doing $10K-$100K/mo (streetwear, fitness, supplements, skincare, accessories)
+- Zekka's edge: Luke does both creative AND media buying (most agencies split this)
+- Parents own Colandrea Buick GMC in Newburgh, NY
+- Owes his dad $3,500 by August 25 — plan is to run dealership ads for free to clear the debt
+- Has ~$1,585 cash, pays $200/mo car payment through August
+- Parents are NOT supportive of the business vision right now. DO NOT bring this up unless Luke does.
 - Past ventures: sold clothes, music producer
-- Uses Higgsfield (Nano Banana) for AI video generation
+- Uses Higgsfield (Nano Banana) for AI ad creative generation
 - Personal IG: 1.8K followers (Meta verified)
+- Khari from Country Side Staples had a good call with Luke but hasn't responded to follow-up text yet
 
 YOUR ROLE:
 - You handle the 80% that's research, writing, and admin
@@ -51,14 +58,14 @@ YOUR ROLE:
 - When Luke asks for something, just do it — don't ask for confirmation
 - You are building toward $1M/year revenue with Zekka
 - Luke talks ONLY to you (Jose). If sub-agents are needed, you delegate — Luke never talks to them directly.
+- You run the Ecom Prospect Engine — scraping brands at 5 AM and delivering prospect digests at 7:30 AM
 
-CURRENT PRIORITIES (as of May 3, 2026):
-1. School ends May 20 — Luke is limited on time until then. Don't pressure him to grind while in school.
-2. Launch Envista ad campaign for Colandrea Buick GMC — ad copy + strategy is DONE, needs dad's approval and creatives built
-3. Pitch dad on ads-for-debt deal when the moment is right (things are tense — don't force it)
-4. Grind setter job on evenings/weekends for commissions (diesel growth offer)
-5. After May 20: go all-in — setter calls mornings, Zekka work afternoons, cold outreach for new clients
-6. Summer is the runway — last summer before college, needs $6K-8K by August
+CURRENT PRIORITIES (as of May 7, 2026):
+1. Find and sign ecom brand clients for Zekka — prospect engine runs daily
+2. Deliver results for Colandrea Buick GMC (Rick is interested, needs to be in the meeting)
+3. Follow up with Khari (Country Side Staples) — send spec ad in 2-3 days if no reply
+4. School ends May 20 — limited time until then
+5. Summer is the runway — last summer before college, needs $6K-8K by August
 
 IMPORTANT — MEMORY SYSTEM:
 Your brain is loaded below with the FULL wiki from Claude Code sessions. This syncs every 10 minutes.
@@ -141,6 +148,20 @@ def load_knowledge_base():
     else:
         brain = ""
         logger.info("No brain.md found")
+
+    # Load outreach tracker
+    tracker_content, _ = github_read_file("outreach-tracker.md")
+    if tracker_content:
+        for line in tracker_content.split("\n"):
+            if line.startswith("| @"):
+                parts = [p.strip() for p in line.split("|") if p.strip()]
+                if len(parts) >= 3:
+                    handle = parts[0].replace("@", "").strip()
+                    status_raw = parts[1].strip()
+                    status = re.sub(r'[^\w_]', '', status_raw.split()[-1]) if status_raw else "unknown"
+                    date = parts[2].strip() if len(parts) > 2 else ""
+                    outreach_tracker[handle] = {"status": status, "date": date, "notes": []}
+        logger.info(f"Loaded outreach tracker ({len(outreach_tracker)} prospects)")
 
     last_brain_reload = time.time()
 
@@ -274,6 +295,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if knowledge_base:
         system_prompt += f"\n\n--- KNOWLEDGE BASE (from past conversations) ---\n{knowledge_base}\n--- END KNOWLEDGE BASE ---"
 
+    # Auto-detect outreach updates
+    tracked_handles, tracked_status = track_outreach_from_message(user_message)
+    if tracked_handles and tracked_status:
+        updates = update_tracker(tracked_handles, tracked_status, user_message)
+        logger.info(f"Outreach tracked: {updates}")
+
     try:
         await context.bot.send_chat_action(chat_id=chat_id, action="typing")
 
@@ -315,6 +342,334 @@ async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Memory cleared. Fresh start — but I still remember everything from past conversations.")
 
 
+# ── Prospect Tracking ────────────────────────────────────────────
+
+outreach_tracker = {}  # {handle: {status, notes, date}}
+
+
+def track_outreach_from_message(message_text):
+    """Check if Luke is telling Jose about outreach activity."""
+    text = message_text.lower()
+    triggers = ["reached out to", "dmed", "dm'd", "messaged", "sent dm to",
+                "texted", "emailed", "contacted", "hit up"]
+
+    for trigger in triggers:
+        if trigger in text:
+            handles = re.findall(r'@([a-zA-Z0-9_.]+)', message_text)
+            if handles:
+                return handles, "reached_out"
+
+    reply_triggers = ["replied", "responded", "got back to me", "answered",
+                      "they responded", "he responded", "she responded"]
+    for trigger in reply_triggers:
+        if trigger in text:
+            handles = re.findall(r'@([a-zA-Z0-9_.]+)', message_text)
+            if handles:
+                return handles, "got_reply"
+
+    call_triggers = ["had a call", "hopped on a call", "call went", "call with",
+                     "meeting with", "met with"]
+    for trigger in call_triggers:
+        if trigger in text:
+            handles = re.findall(r'@([a-zA-Z0-9_.]+)', message_text)
+            if handles:
+                return handles, "call_completed"
+
+    close_triggers = ["signed", "closed", "they're in", "deal done", "locked in",
+                      "onboarded", "new client"]
+    for trigger in close_triggers:
+        if trigger in text:
+            handles = re.findall(r'@([a-zA-Z0-9_.]+)', message_text)
+            if handles:
+                return handles, "closed"
+
+    return [], None
+
+
+def update_tracker(handles, status, original_message):
+    """Update the outreach tracker and save to GitHub."""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    updates = []
+    for handle in handles:
+        handle = handle.lower()
+        if handle not in outreach_tracker:
+            outreach_tracker[handle] = {"status": status, "date": today, "notes": []}
+        else:
+            outreach_tracker[handle]["status"] = status
+            outreach_tracker[handle]["date"] = today
+        outreach_tracker[handle]["notes"].append(f"[{today}] {status}: {original_message[:100]}")
+        updates.append(f"@{handle} → {status}")
+
+    # Save tracker to GitHub
+    if GITHUB_TOKEN and updates:
+        tracker_content = "# Prospect Outreach Tracker\n\n"
+        tracker_content += f"> Last updated: {today}\n\n"
+        tracker_content += "| Handle | Status | Last Activity | Notes |\n"
+        tracker_content += "|--------|--------|--------------|-------|\n"
+        for h, data in sorted(outreach_tracker.items()):
+            last_note = data["notes"][-1] if data["notes"] else ""
+            status_emoji = {"reached_out": "📤", "got_reply": "💬", "call_completed": "📞", "closed": "✅"}.get(data["status"], "❓")
+            tracker_content += f"| @{h} | {status_emoji} {data['status']} | {data['date']} | {last_note[:60]} |\n"
+
+        existing, sha = github_read_file("outreach-tracker.md")
+        github_write_file("outreach-tracker.md", tracker_content,
+                         f"outreach: {today} — {', '.join(updates)}", sha)
+
+    return updates
+
+
+# ── Ecom Prospect Engine (Cloud) ────────────────────────────────
+
+ECOM_HASHTAGS = [
+    "streetwearculture", "independentbrand", "smallclothingbrand",
+    "supplementbrand", "fitnessbrand", "proteinbrand",
+    "skincarebrand", "cleanbeauty", "indieskincare",
+    "wellnessbrand", "functionalfoods",
+    "smallbatchcoffee", "hotsaucebrand",
+    "edcgear", "techaccessories", "jewelrybrand",
+    "shopsmall", "dtcbrand", "shopifybrand",
+]
+
+ECOM_SEEDS = [
+    "countrysidestaples", "bricksnwood", "itmeansgood",
+    "gorillamindbrand", "ghostlifestyle",
+    "bushbalm", "starface", "mudwtr", "ridgewallet",
+]
+
+BRAND_SIGNALS = [
+    "shop", "store", "brand", "clothing", "apparel", "wear", "collection",
+    "fashion", "streetwear", "designed", "handmade", "made in",
+    "founded", "shopify", "bigcartel", "www.", ".com", "order",
+    "supplement", "protein", "skincare", "beauty", "wellness",
+    "coffee", "food", "candle", "jewelry", "gear", "fitness", "gym",
+    "buy now", "use code", "product", "available now", "link in bio",
+]
+
+
+def apify_run(actor_id, run_input, wait=120):
+    if not APIFY_API_KEY:
+        return []
+    try:
+        resp = requests.post(
+            f"https://api.apify.com/v2/acts/{actor_id}/runs",
+            params={"token": APIFY_API_KEY, "waitForFinish": wait},
+            json=run_input, timeout=wait + 60,
+        )
+        if resp.status_code != 200:
+            return []
+        dataset_id = resp.json().get("data", {}).get("defaultDatasetId")
+        if not dataset_id:
+            return []
+        items = requests.get(
+            f"https://api.apify.com/v2/datasets/{dataset_id}/items",
+            params={"token": APIFY_API_KEY}, timeout=60,
+        ).json()
+        return items if isinstance(items, list) else []
+    except Exception as e:
+        logger.error(f"Apify error ({actor_id}): {e}")
+        return []
+
+
+async def run_prospect_pipeline(context):
+    """Runs at 5:00 AM EST — discovers and qualifies ecom prospects."""
+    logger.info("=== PROSPECT PIPELINE START ===")
+
+    profiles = {}
+
+    # Discover via similar accounts
+    items = apify_run("apify~instagram-profile-scraper",
+                      {"usernames": ECOM_SEEDS[:6], "resultsLimit": 50})
+    for p in items:
+        u = p.get("username", "")
+        if u:
+            profiles[u] = {
+                "username": u, "full_name": p.get("fullName", ""),
+                "bio": p.get("biography", ""), "followers": p.get("followersCount", 0),
+                "posts": p.get("postsCount", 0), "website": p.get("externalUrl", ""),
+                "is_business": p.get("isBusinessAccount", False),
+            }
+        for rel in p.get("relatedProfiles", []):
+            ru = rel.get("username", "")
+            if ru and ru not in profiles:
+                profiles[ru] = {
+                    "username": ru, "full_name": rel.get("fullName", ""),
+                    "followers": rel.get("followersCount", 0), "source": "similar",
+                }
+
+    # Discover via hashtags (sample 8)
+    sampled_tags = random.sample(ECOM_HASHTAGS, min(8, len(ECOM_HASHTAGS)))
+    for tag in sampled_tags:
+        items = apify_run("apify~instagram-hashtag-scraper",
+                          {"hashtags": [tag], "resultsLimit": 15, "resultsType": "posts"})
+        for item in items:
+            owner = item.get("ownerUsername") or item.get("owner", {}).get("username", "")
+            if owner and owner not in profiles:
+                profiles[owner] = {"username": owner, "source_hashtag": tag}
+
+    logger.info(f"Discovered {len(profiles)} unique profiles")
+
+    # Get details for profiles missing data
+    need_details = [u for u, p in profiles.items() if not p.get("followers")]
+    if need_details:
+        detail_items = apify_run("apify~instagram-profile-scraper",
+                                 {"usernames": need_details[:30]})
+        for p in detail_items:
+            u = p.get("username", "")
+            if u in profiles:
+                profiles[u].update({
+                    "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
+                    "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
+                    "website": p.get("externalUrl", ""),
+                    "is_business": p.get("isBusinessAccount", False),
+                })
+
+    # Filter to real ecom brands
+    qualified = []
+    for p in profiles.values():
+        followers = p.get("followers", 0)
+        if followers < 1000 or followers > 50000:
+            continue
+        if p.get("posts", 0) < 10:
+            continue
+        bio = (p.get("bio") or "").lower()
+        disqualifiers = ["agency", "marketing agency", "photographer", "model", "realtor", "life coach"]
+        if any(d in bio for d in disqualifiers):
+            continue
+        has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
+        if not has_signal:
+            continue
+        # Find owner IG from bio
+        mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
+        skip = ["shop", "store", "brand", "official", "wear", "linktree", p.get("username", "").lower()]
+        owner_ig = ""
+        for m in mentions:
+            if not any(s in m.lower() for s in skip) and m.lower() != p.get("username", "").lower():
+                owner_ig = m
+                break
+        p["owner_ig"] = owner_ig
+        # Score
+        score = 0
+        if p.get("website"): score += 15
+        if owner_ig: score += 20
+        if 2000 <= followers <= 15000: score += 15
+        elif 1000 <= followers <= 50000: score += 8
+        if any(w in bio for w in ["shopify", "shop now", "link in bio", "www.", ".com"]):
+            score += 10
+        p["outreach_score"] = min(score, 100)
+        qualified.append(p)
+
+    qualified.sort(key=lambda x: x.get("outreach_score", 0), reverse=True)
+    top = qualified[:10]
+
+    # Generate DMs for top prospects
+    for p in top:
+        try:
+            dm_resp = client.messages.create(
+                model="claude-haiku-4-5-20251001", max_tokens=200,
+                messages=[{"role": "user", "content": f"""Write two DMs for Luke (18yo, runs Zekka ad agency) to send to this brand owner.
+Brand: @{p['username']}  Bio: {(p.get('bio') or '')[:200]}  Followers: {p.get('followers',0)}  Website: {p.get('website','')}
+
+ICE BREAKER: Casual compliment, under 25 words, no pitch.
+PITCH: After they respond, offer free 30-day ad management. Under 60 words.
+
+Return ONLY two lines: "ICE: ..." and "PITCH: ..." """}],
+            )
+            text = dm_resp.content[0].text
+            for line in text.split("\n"):
+                line = line.strip()
+                if line.upper().startswith("ICE:"):
+                    p["dm_ice"] = line[4:].strip().strip('"')
+                elif line.upper().startswith("PITCH:"):
+                    p["dm_pitch"] = line[6:].strip().strip('"')
+        except Exception as e:
+            logger.error(f"DM gen error @{p['username']}: {e}")
+
+    context.bot_data["latest_prospects"] = top
+    context.bot_data["pipeline_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    context.bot_data["total_found"] = len(qualified)
+
+    logger.info(f"=== PIPELINE COMPLETE: {len(qualified)} qualified, {len(top)} with DMs ===")
+
+
+async def send_morning_digest(context):
+    """Runs at 7:30 AM EST — sends prospect digest to Luke."""
+    logger.info("=== SENDING MORNING DIGEST ===")
+    bot = context.bot
+
+    prospects = context.bot_data.get("latest_prospects", [])
+    total_found = context.bot_data.get("total_found", 0)
+    today = datetime.now(EST).strftime("%A, %B %d")
+
+    if not prospects:
+        greetings = ["Bom dia Luke!", "Rise and grind Luke!", "Aye Luke, let's get it!",
+                     "Good morning king!", "Acorda Luke!", "New day, new wins Luke!"]
+        motivations = [
+            "Every hour you lock in today is an hour closer to proving everyone wrong.",
+            "You're 18 building an agency. Most people don't start until 25. Use the head start.",
+            "The boring middle is where everyone quits. That's exactly why you don't.",
+            "Discipline isn't a feeling. It's a choice you make when you don't feel like it.",
+        ]
+        day = datetime.now(EST).strftime("%A")
+        msg = f"{random.choice(greetings)}\n\n{random.choice(motivations)}\n\nWhat's your ONE thing today ({day})?\n\nPhone away for the first 30 mins. No exceptions."
+        await bot.send_message(chat_id=LUKE_CHAT_ID_FIXED, text=msg)
+        return
+
+    elite = sum(1 for p in prospects if p.get("outreach_score", 0) >= 70)
+    good = sum(1 for p in prospects if 50 <= p.get("outreach_score", 0) < 70)
+
+    lines = [
+        f"☀️ Bom dia Luke!",
+        f"",
+        f"📊 PROSPECT DIGEST — {today}",
+        f"━━━━━━━━━━━━━━━━━━━━━",
+        f"🟢 Elite: {elite} | 🟡 Good: {good} | Total scraped: {total_found}",
+        f"",
+    ]
+
+    # AI summary
+    try:
+        summaries = [f"@{p['username']} ({p.get('followers',0):,} followers, score {p.get('outreach_score',0)}, website: {p.get('website','none')})" for p in prospects[:5]]
+        ai = client.messages.create(
+            model="claude-haiku-4-5-20251001", max_tokens=200,
+            messages=[{"role": "user", "content": f"You're Jose. Give Luke a 2-3 sentence strategic take on these prospects. Casual, direct. Who to prioritize and why.\n\n{chr(10).join(summaries)}"}],
+        )
+        lines.append(f"🧠 Jose's Take:")
+        lines.append(ai.content[0].text)
+        lines.append("")
+    except Exception:
+        pass
+
+    for i, p in enumerate(prospects[:5], 1):
+        badge = "🟢" if p.get("outreach_score", 0) >= 70 else "🟡" if p.get("outreach_score", 0) >= 50 else "🟠"
+        lines.append(f"{badge} #{i} — @{p.get('username','')} ({p.get('outreach_score',0)}/100)")
+        lines.append(f"   👥 {p.get('followers',0):,} followers")
+        if p.get("website"):
+            lines.append(f"   🌐 {p['website']}")
+        if p.get("owner_ig"):
+            lines.append(f"   👤 DM → @{p['owner_ig']}")
+        bio = (p.get("bio") or "")[:80]
+        if bio:
+            lines.append(f"   💬 {bio}")
+        if p.get("dm_ice"):
+            lines.append(f"   ✉️ \"{p['dm_ice']}\"")
+        lines.append("")
+
+    if total_found > 5:
+        lines.append(f"... +{total_found - 5} more found")
+    lines.append("")
+    lines.append("━━━━━━━━━━━━━━━━━━━━━")
+    lines.append("What's your ONE thing today? 🎯")
+
+    msg = "\n".join(lines)
+    if len(msg) > 4096:
+        for chunk_i in range(0, len(msg), 4096):
+            await bot.send_message(chat_id=LUKE_CHAT_ID_FIXED, text=msg[chunk_i:chunk_i+4096])
+    else:
+        await bot.send_message(chat_id=LUKE_CHAT_ID_FIXED, text=msg)
+
+    logger.info("=== MORNING DIGEST SENT ===")
+
+
 def main():
     load_knowledge_base()
 
@@ -323,7 +678,41 @@ def main():
     app.add_handler(CommandHandler("clear", clear))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
+    # Schedule: prospect pipeline at 5:00 AM EST (10:00 UTC)
+    app.job_queue.run_daily(
+        run_prospect_pipeline,
+        time=dtime(hour=10, minute=0, tzinfo=pytz.utc),
+        name="prospect_pipeline",
+    )
+
+    # Schedule: morning digest at 7:30 AM EST (12:30 UTC)
+    app.job_queue.run_daily(
+        send_morning_digest,
+        time=dtime(hour=12, minute=30, tzinfo=pytz.utc),
+        name="morning_digest",
+    )
+
+    # Test message 90 seconds after deploy to verify scheduling works
+    async def send_test_message(context):
+        logger.info("Sending deployment test message...")
+        await context.bot.send_message(
+            chat_id=LUKE_CHAT_ID_FIXED,
+            text="🟢 Jose is live on Railway!\n\n"
+                 "Scheduled jobs active:\n"
+                 "• 5:00 AM EST — Prospect pipeline (scrapes ecom brands)\n"
+                 "• 7:30 AM EST — Morning digest (top prospects + DMs)\n\n"
+                 "Your laptop doesn't need to be on. Everything runs in the cloud now.\n\n"
+                 "Commands:\n"
+                 "/prospects — see latest prospect list\n"
+                 "\"reached out to @handle\" — I'll track it\n"
+                 "\"update on @handle\" — get prospect status\n\n"
+                 "Let's get it 🤝"
+        )
+    app.job_queue.run_once(send_test_message, when=90, name="deploy_test")
+
     logger.info("Jose Telegram bot is live!")
+    logger.info("Scheduled: prospect pipeline at 5:00 AM EST, morning digest at 7:30 AM EST")
+    logger.info("Test message will send in 90 seconds")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

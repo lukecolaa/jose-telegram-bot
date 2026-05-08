@@ -1,2 +1,4 @@
-python-telegram-bot==22.5
+python-telegram-bot[job-scheduler]==22.5
 anthropic==0.96.0
+requests==2.32.3
+pytz==2024.2
