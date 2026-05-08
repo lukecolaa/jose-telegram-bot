@@ -556,3 +556,8 @@
 ### 2026-05-08 13:52 UTC
 [TASK] Luke needs backend fixed ASAP — specifics unknown, waiting for diagnosis from Jose
 [TASK] Jose identified 5 potential failure points: Telegram bot, Claude Code sync, GHL connection, Prospect engine, or unknown issue — needs Luke to clarify which system is actually broken
+
+### 2026-05-08 13:52 UTC
+[TASK] Fix `/prospects` command - diagnose error/timeout/empty results
+[TASK] Determine when `/prospects` command last worked successfully
+[TASK] Clarify what Luke needs from `/prospects` - today's digest, specific list, or other output
