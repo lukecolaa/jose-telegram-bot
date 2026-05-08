@@ -1,4 +1,5 @@
-python-telegram-bot[job-scheduler]==22.5
+python-telegram-bot==22.5
+APScheduler>=3.10.4,<4.0
 anthropic==0.96.0
 requests==2.32.3
 pytz==2024.2
