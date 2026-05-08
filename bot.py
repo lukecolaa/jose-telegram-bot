@@ -821,180 +821,78 @@ def main():
         name="morning_digest",
     )
 
-    # TEST: deep research on 1 real prospect — full pipeline preview
-    async def test_single_prospect(context):
-        logger.info("=== TEST DEEP PROSPECT RUN START ===")
+    # FORMAT TEST: show Luke what the morning digest looks like using a sample prospect
+    async def test_format_preview(context):
+        logger.info("=== FORMAT PREVIEW TEST ===")
+        sample = {
+            "username": "samplestreetwear",
+            "full_name": "Sample Streetwear Co.",
+            "bio": "Handcrafted streetwear from Brooklyn 🗽 Shop our latest drop ⬇️ @founderhandle",
+            "followers": 8200,
+            "posts": 147,
+            "website": "samplestreetwear.com",
+            "owner_ig": "founderhandle",
+            "avg_engagement": 340,
+            "website_signals": "Shopify store | NO Meta Pixel detected | Uses Klaviyo (email) | Price range: $35-$120",
+        }
+        analysis = ai_research_prospect(sample, sample["website_signals"])
+        if not analysis:
+            analysis = {
+                "niche": "streetwear", "quality_score": 82,
+                "what_they_sell": "Handcrafted streetwear — hoodies, tees, and accessories with Brooklyn-inspired graphics",
+                "strengths": "Strong brand identity, engaged community, consistent posting with quality product shots",
+                "weaknesses": "No Meta Pixel means zero retargeting. Running Klaviyo but likely no paid traffic feeding it. Leaving money on the table.",
+                "ad_opportunity": "Install pixel, launch retargeting + lookalike campaigns on Meta. Their organic is solid — paid would scale them fast.",
+                "dm_ice_breaker": "Your latest drop is fire — the hoodie colorways are next level. Brooklyn roots show in every piece.",
+                "dm_pitch": "I run a small ad agency and noticed you don't have a Meta Pixel set up yet. I'd love to run your ads free for 30 days — retargeting alone would probably 2x your site traffic. No risk, just results.",
+            }
+
+        a = analysis
+        score = a.get("quality_score", 82)
+        badge = "🟢" if score >= 70 else "🟡" if score >= 50 else "🟠"
+        niche = a.get("niche", "streetwear").upper()
+
+        lines = [
+            "🧪 FORMAT PREVIEW — this is what your 7:30 AM digest will look like",
+            "(using a sample prospect since Apify is rate-limited from testing)",
+            "━━━━━━━━━━━━━━━━━━━━━",
+            "",
+            f"{badge} @{sample['username']} [{niche}] — {score}/100",
+            f"👥 {sample['followers']:,} followers | {sample['posts']} posts",
+            f"📈 ~{sample['avg_engagement']:,} avg likes/post",
+        ]
+        if a.get("what_they_sell"):
+            lines.append(f"🛍️ {a['what_they_sell']}")
+        lines.append(f"🌐 {sample['website']}")
+        lines.append(f"🔧 {sample['website_signals']}")
+        lines.append("")
+        if a.get("strengths"):
+            lines.append(f"✅ Strengths: {a['strengths']}")
+        if a.get("weaknesses"):
+            lines.append(f"⚠️ Weaknesses: {a['weaknesses']}")
+        if a.get("ad_opportunity"):
+            lines.append(f"🎯 Opportunity: {a['ad_opportunity']}")
+        lines.append("")
+        lines.append(f"👤 DM the owner → @{sample['owner_ig']}")
+        if a.get("dm_ice_breaker"):
+            lines.append(f"✉️ Ice Breaker:")
+            lines.append(f"\"{a['dm_ice_breaker']}\"")
+        if a.get("dm_pitch"):
+            lines.append("")
+            lines.append(f"📨 Pitch (after they reply):")
+            lines.append(f"\"{a['dm_pitch']}\"")
+        lines.append("")
+        lines.append("━━━━━━━━━━━━━━━━━━━━━")
+        lines.append("✅ Tomorrow at 7:30 AM you'll get 5-8 REAL prospects like this.")
+        lines.append("Pipeline runs at 5 AM, digest hits at 7:30. All cloud — laptop off is fine.")
+
         await context.bot.send_message(
             chat_id=LUKE_CHAT_ID_FIXED,
-            text="🧪 Running deep prospect test — scraping, researching, analyzing...\nThis takes ~90 seconds. Hang tight."
+            text="\n".join(lines)
         )
-        try:
-            # Try multiple seeds until we find related profiles
-            candidates = {}
-            used_seed = ""
-            shuffled_seeds = random.sample(ECOM_SEEDS, len(ECOM_SEEDS))
-            for seed in shuffled_seeds[:4]:
-                items = apify_run("apify~instagram-profile-scraper",
-                                  {"usernames": [seed], "resultsLimit": 10})
-                for p in items:
-                    for rel in p.get("relatedProfiles", []):
-                        ru = rel.get("username", "")
-                        fc = rel.get("followersCount", 0)
-                        if ru and ru not in ECOM_SEEDS and 1000 <= fc <= 50000:
-                            candidates[ru] = {
-                                "username": ru, "full_name": rel.get("fullName", ""),
-                                "followers": fc, "source": f"similar to @{seed}",
-                            }
-                if candidates:
-                    used_seed = seed
-                    break
-                logger.info(f"Test: no related profiles from @{seed}, trying next seed...")
+        logger.info("=== FORMAT PREVIEW SENT ===")
 
-            # Fallback: try a hashtag if seeds fail
-            if not candidates:
-                tag = random.choice(ECOM_HASHTAGS)
-                logger.info(f"Test: seeds failed, trying hashtag #{tag}")
-                hash_items = apify_run("apify~instagram-hashtag-scraper",
-                                       {"hashtags": [tag], "resultsLimit": 20, "resultsType": "posts"})
-                for item in hash_items:
-                    owner = item.get("ownerUsername") or item.get("owner", {}).get("username", "")
-                    if owner:
-                        candidates[owner] = {"username": owner, "source": f"hashtag #{tag}"}
-                used_seed = f"#{tag}"
-
-            if not candidates:
-                await context.bot.send_message(
-                    chat_id=LUKE_CHAT_ID_FIXED,
-                    text="⚠️ Apify returned no profiles from any seed or hashtag. Might be a rate limit — the full 5 AM run will retry."
-                )
-                return
-
-            # Get full details on top 5 candidates
-            top_usernames = list(candidates.keys())[:5]
-            detail_items = apify_run("apify~instagram-profile-scraper",
-                                     {"usernames": top_usernames})
-            for p in detail_items:
-                u = p.get("username", "")
-                if u in candidates:
-                    candidates[u].update({
-                        "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
-                        "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
-                        "website": p.get("externalUrl", ""),
-                        "is_business": p.get("isBusinessAccount", False),
-                    })
-
-            # Filter out obvious non-brands
-            filtered = []
-            for p in candidates.values():
-                if not p.get("bio"):
-                    continue
-                bio = (p.get("bio") or "").lower()
-                if any(d in bio for d in DISQUALIFIERS):
-                    continue
-                has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
-                if has_signal:
-                    mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
-                    skip_words = ["shop", "store", "brand", "official", "wear", p.get("username", "").lower()]
-                    owner_ig = ""
-                    for m in mentions:
-                        if not any(s in m.lower() for s in skip_words):
-                            owner_ig = m
-                            break
-                    p["owner_ig"] = owner_ig
-                    filtered.append(p)
-
-            if not filtered:
-                await context.bot.send_message(
-                    chat_id=LUKE_CHAT_ID_FIXED,
-                    text=f"⚠️ Found {len(candidates)} profiles from {used_seed} but none had brand signals. Full 5 AM pipeline runs much wider."
-                )
-                return
-
-            # Pick the best candidate and do deep research
-            pick = filtered[0]
-
-            # Get recent posts for engagement
-            try:
-                post_items = apify_run("apify~instagram-post-scraper",
-                                       {"directUrls": [f"https://www.instagram.com/{pick['username']}/"],
-                                        "resultsLimit": 6})
-                if post_items:
-                    likes = [item.get("likesCount", 0) for item in post_items if item.get("likesCount")]
-                    pick["avg_engagement"] = sum(likes) // len(likes) if likes else 0
-                    captions = [item.get("caption", "")[:100] for item in post_items[:3] if item.get("caption")]
-                    pick["recent_captions"] = " | ".join(captions)
-            except Exception:
-                pass
-
-            # Website analysis
-            website_signals = scrape_website_brief(pick.get("website", ""))
-            pick["website_signals"] = website_signals
-
-            # AI deep research
-            analysis = ai_research_prospect(pick, website_signals)
-            if not analysis:
-                analysis = {"quality_score": 50, "what_they_sell": "Unknown", "niche": "ecom",
-                            "strengths": "Needs more research", "weaknesses": "Unclear from data",
-                            "ad_opportunity": "Potential for paid social", "dm_ice_breaker": "", "dm_pitch": ""}
-
-            pick["analysis"] = analysis
-            pick["outreach_score"] = analysis.get("quality_score", 50)
-
-            # Format the deep brief
-            a = analysis
-            badge = "🟢" if pick["outreach_score"] >= 70 else "🟡" if pick["outreach_score"] >= 50 else "🟠"
-            niche = a.get("niche", "ecom").upper()
-
-            lines = [
-                f"🧪 DEEP PROSPECT TEST",
-                f"Found via: {used_seed}",
-                f"━━━━━━━━━━━━━━━━━━━━━",
-                f"",
-                f"{badge} @{pick.get('username','')} [{niche}] — {pick['outreach_score']}/100",
-                f"👥 {pick.get('followers',0):,} followers | {pick.get('posts',0)} posts",
-            ]
-            if pick.get("avg_engagement"):
-                lines.append(f"📈 ~{pick['avg_engagement']:,} avg likes/post")
-            if a.get("what_they_sell"):
-                lines.append(f"🛍️ {a['what_they_sell']}")
-            if pick.get("website"):
-                lines.append(f"🌐 {pick['website']}")
-            if website_signals:
-                lines.append(f"🔧 {website_signals[:100]}")
-            lines.append("")
-            if a.get("strengths"):
-                lines.append(f"✅ Strengths: {a['strengths']}")
-            if a.get("weaknesses"):
-                lines.append(f"⚠️ Weaknesses: {a['weaknesses']}")
-            if a.get("ad_opportunity"):
-                lines.append(f"🎯 Opportunity: {a['ad_opportunity']}")
-            lines.append("")
-            if pick.get("owner_ig"):
-                lines.append(f"👤 DM the owner → @{pick['owner_ig']}")
-            if a.get("dm_ice_breaker"):
-                lines.append(f"✉️ Ice Breaker:")
-                lines.append(f"\"{a['dm_ice_breaker']}\"")
-            if a.get("dm_pitch"):
-                lines.append(f"")
-                lines.append(f"📨 Pitch (after they reply):")
-                lines.append(f"\"{a['dm_pitch']}\"")
-            lines.append("")
-            lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
-            lines.append(f"✅ This is what each prospect will look like at 7:30 AM. Full run = 5-8 of these.")
-
-            await context.bot.send_message(
-                chat_id=LUKE_CHAT_ID_FIXED,
-                text="\n".join(lines)
-            )
-        except Exception as e:
-            logger.error(f"Test prospect error: {e}")
-            await context.bot.send_message(
-                chat_id=LUKE_CHAT_ID_FIXED,
-                text=f"⚠️ Test error: {str(e)[:200]}\n\nLikely an Apify rate limit. Full 5 AM run will work."
-            )
-        logger.info("=== TEST DEEP PROSPECT RUN COMPLETE ===")
-
-    app.job_queue.run_once(test_single_prospect, when=60, name="test_prospect")
+    app.job_queue.run_once(test_format_preview, when=30, name="format_preview")
 
     logger.info("Jose Telegram bot is live!")
     logger.info("Scheduled: prospect pipeline at 5:00 AM EST, morning digest at 7:30 AM EST")
