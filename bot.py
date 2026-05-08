@@ -85,7 +85,7 @@ conversation_history = {}
 knowledge_base = ""
 brain = ""
 last_brain_reload = 0
-BRAIN_RELOAD_INTERVAL = 600  # reload brain + knowledge every 10 minutes
+BRAIN_RELOAD_INTERVAL = 600
 
 
 def github_read_file(file_path):
@@ -149,7 +149,6 @@ def load_knowledge_base():
         brain = ""
         logger.info("No brain.md found")
 
-    # Load outreach tracker
     tracker_content, _ = github_read_file("outreach-tracker.md")
     if tracker_content:
         for line in tracker_content.split("\n"):
@@ -295,7 +294,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if knowledge_base:
         system_prompt += f"\n\n--- KNOWLEDGE BASE (from past conversations) ---\n{knowledge_base}\n--- END KNOWLEDGE BASE ---"
 
-    # Auto-detect outreach updates
     tracked_handles, tracked_status = track_outreach_from_message(user_message)
     if tracked_handles and tracked_status:
         updates = update_tracker(tracked_handles, tracked_status, user_message)
@@ -356,7 +354,7 @@ async def prospects_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text(
                 "⚠️ Pipeline ran but found no qualified prospects this round.\n"
-                "Could be an Apify rate limit. Try again in 10-15 mins, or I'll get them at 5 AM."
+                "Could be an Apify issue. Try again in 10-15 mins, or I'll get them at 5 AM."
             )
     except Exception as e:
         logger.error(f"/prospects command error: {e}")
@@ -367,15 +365,12 @@ async def prospects_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ── Prospect Tracking ────────────────────────────────────────────
 
-outreach_tracker = {}  # {handle: {status, notes, date}}
-
+outreach_tracker = {}
 
 def track_outreach_from_message(message_text):
-    """Check if Luke is telling Jose about outreach activity."""
     text = message_text.lower()
     triggers = ["reached out to", "dmed", "dm'd", "messaged", "sent dm to",
                 "texted", "emailed", "contacted", "hit up"]
-
     for trigger in triggers:
         if trigger in text:
             handles = re.findall(r'@([a-zA-Z0-9_.]+)', message_text)
@@ -410,7 +405,6 @@ def track_outreach_from_message(message_text):
 
 
 def update_tracker(handles, status, original_message):
-    """Update the outreach tracker and save to GitHub."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     updates = []
     for handle in handles:
@@ -423,7 +417,6 @@ def update_tracker(handles, status, original_message):
         outreach_tracker[handle]["notes"].append(f"[{today}] {status}: {original_message[:100]}")
         updates.append(f"@{handle} → {status}")
 
-    # Save tracker to GitHub
     if GITHUB_TOKEN and updates:
         tracker_content = "# Prospect Outreach Tracker\n\n"
         tracker_content += f"> Last updated: {today}\n\n"
@@ -442,16 +435,6 @@ def update_tracker(handles, status, original_message):
 
 
 # ── Ecom Prospect Engine (Cloud) ────────────────────────────────
-
-ECOM_HASHTAGS = [
-    "streetwearculture", "independentbrand", "smallclothingbrand",
-    "supplementbrand", "fitnessbrand", "proteinbrand",
-    "skincarebrand", "cleanbeauty", "indieskincare",
-    "wellnessbrand", "functionalfoods",
-    "smallbatchcoffee", "hotsaucebrand",
-    "edcgear", "techaccessories", "jewelrybrand",
-    "shopsmall", "dtcbrand", "shopifybrand",
-]
 
 ECOM_SEEDS = [
     "countrysidestaples", "bricksnwood", "itmeansgood",
@@ -474,33 +457,75 @@ DISQUALIFIERS = [
     "meme", "news", "media company", "influencer agency",
 ]
 
+# Track Apify status across calls
+apify_status = {"ok": True, "last_error": "", "credits_exhausted": False}
 
-def apify_run(actor_id, run_input, wait=120):
+
+def apify_run(actor_id, run_input, wait=180):
+    """Run an Apify actor with full error logging."""
     if not APIFY_API_KEY:
+        logger.error("APIFY_API_KEY not set!")
+        apify_status["last_error"] = "No API key"
+        return []
+    if apify_status["credits_exhausted"]:
+        logger.warning("Skipping Apify call — credits known exhausted")
         return []
     try:
+        logger.info(f"Apify: starting {actor_id} with input: {json.dumps(run_input)[:200]}")
         resp = requests.post(
             f"https://api.apify.com/v2/acts/{actor_id}/runs",
             params={"token": APIFY_API_KEY, "waitForFinish": wait},
             json=run_input, timeout=wait + 60,
         )
-        if resp.status_code != 200:
+        if resp.status_code == 402:
+            logger.error("Apify 402: credits exhausted!")
+            apify_status["credits_exhausted"] = True
+            apify_status["last_error"] = "402 — no credits left. Need to add billing or wait for monthly reset."
             return []
-        dataset_id = resp.json().get("data", {}).get("defaultDatasetId")
+        if resp.status_code == 429:
+            logger.error("Apify 429: rate limited")
+            apify_status["last_error"] = "429 — rate limited. Too many requests."
+            return []
+        if resp.status_code != 200 and resp.status_code != 201:
+            body = resp.text[:500]
+            logger.error(f"Apify HTTP {resp.status_code}: {body}")
+            apify_status["last_error"] = f"HTTP {resp.status_code}: {body[:200]}"
+            return []
+
+        run_data = resp.json().get("data", {})
+        run_status = run_data.get("status", "")
+        dataset_id = run_data.get("defaultDatasetId")
+
+        if run_status == "FAILED":
+            logger.error(f"Apify run FAILED: {run_data.get('statusMessage', 'unknown')}")
+            apify_status["last_error"] = f"Run failed: {run_data.get('statusMessage', '')[:200]}"
+            return []
+
         if not dataset_id:
+            logger.error(f"Apify: no dataset ID returned. Status: {run_status}")
+            apify_status["last_error"] = f"No dataset. Run status: {run_status}"
             return []
-        items = requests.get(
+
+        items_resp = requests.get(
             f"https://api.apify.com/v2/datasets/{dataset_id}/items",
             params={"token": APIFY_API_KEY}, timeout=60,
-        ).json()
-        return items if isinstance(items, list) else []
+        )
+        items = items_resp.json()
+        result = items if isinstance(items, list) else []
+        logger.info(f"Apify: {actor_id} returned {len(result)} items")
+        apify_status["ok"] = True
+        return result
+    except requests.exceptions.Timeout:
+        logger.error(f"Apify timeout ({actor_id}) after {wait}s")
+        apify_status["last_error"] = f"Timeout after {wait}s"
+        return []
     except Exception as e:
-        logger.error(f"Apify error ({actor_id}): {e}")
+        logger.error(f"Apify exception ({actor_id}): {e}")
+        apify_status["last_error"] = str(e)[:200]
         return []
 
 
 def scrape_website_brief(url):
-    """Quick scrape of a brand's website — returns key signals."""
     if not url:
         return ""
     if not url.startswith("http"):
@@ -518,32 +543,30 @@ def scrape_website_brief(url):
         if "fbq(" in html or "facebook pixel" in html or "meta pixel" in html:
             signals.append("Has Meta Pixel")
         else:
-            signals.append("NO Meta Pixel detected")
+            signals.append("NO Meta Pixel")
         if "gtag(" in html or "google-analytics" in html or "ga4" in html:
-            signals.append("Has Google Analytics")
+            signals.append("Google Analytics")
         if "tiktok" in html and "pixel" in html:
-            signals.append("Has TikTok Pixel")
+            signals.append("TikTok Pixel")
         if "klaviyo" in html:
-            signals.append("Uses Klaviyo (email)")
+            signals.append("Klaviyo")
         if "mailchimp" in html:
-            signals.append("Uses Mailchimp")
+            signals.append("Mailchimp")
         if "add to cart" in html or "add-to-cart" in html:
-            signals.append("Active product pages")
+            signals.append("Active store")
         if "sold out" in html or "out of stock" in html:
-            signals.append("Some products sold out (demand signal)")
-        import re as _re
-        prices = _re.findall(r'\$\d+\.?\d{0,2}', resp.text[:8000])
+            signals.append("Sold out items (demand)")
+        prices = re.findall(r'\$\d+\.?\d{0,2}', resp.text[:8000])
         if prices:
             nums = [float(p.replace("$", "")) for p in prices if float(p.replace("$", "")) > 5]
             if nums:
-                signals.append(f"Price range: ${min(nums):.0f}-${max(nums):.0f}")
-        return " | ".join(signals) if signals else "Website found but no clear signals"
+                signals.append(f"${min(nums):.0f}-${max(nums):.0f}")
+        return " | ".join(signals) if signals else "Website found, no clear signals"
     except Exception:
         return "Website unreachable"
 
 
 def ai_research_prospect(profile_data, website_signals=""):
-    """Use Claude to deeply analyze a prospect and generate a full brief."""
     bio = (profile_data.get("bio") or "")[:300]
     username = profile_data.get("username", "")
     followers = profile_data.get("followers", 0)
@@ -570,7 +593,7 @@ BRAND DATA:
 - Avg likes/post: {engagement}
 - Recent captions: {recent_captions[:400]}
 
-Return ONLY valid JSON with these fields:
+Return ONLY valid JSON:
 {{
   "is_real_brand": true/false,
   "niche": "streetwear/supplements/fitness/skincare/wellness/food/accessories/other",
@@ -579,16 +602,16 @@ Return ONLY valid JSON with these fields:
   "weaknesses": "1-2 sentences — gaps in their marketing/growth",
   "ad_opportunity": "1 sentence — exactly what Zekka could do for them",
   "quality_score": 0-100,
-  "dm_ice_breaker": "Casual, genuine compliment DM under 25 words. Reference something SPECIFIC about their brand. No pitch.",
-  "dm_pitch": "After they reply, this follow-up offers free 30-day ad management. Under 60 words. Mention their specific weakness.",
+  "dm_ice_breaker": "Casual, genuine compliment DM under 25 words. Reference something SPECIFIC. No pitch.",
+  "dm_pitch": "After they reply, offer free 30-day ad management. Under 60 words. Mention their specific weakness.",
   "skip_reason": "Only if is_real_brand is false — why to skip"
 }}
 
-SCORING GUIDE (quality_score):
-90-100: Perfect prospect — real product, engaged audience, no ads, owner reachable
-70-89: Strong prospect — real brand, clear opportunity, worth the DM
+SCORING:
+90-100: Perfect — real product, engaged audience, no ads, owner reachable
+70-89: Strong — real brand, clear opportunity, worth the DM
 50-69: Decent — might work, some yellow flags
-Below 50: Skip — not a real fit for Zekka"""
+Below 50: Skip"""
 
     try:
         resp = client.messages.create(
@@ -607,14 +630,24 @@ Below 50: Skip — not a real fit for Zekka"""
 
 
 async def run_prospect_pipeline(context, is_retry=False):
-    """Runs at 5:00 AM EST — discovers, researches, and qualifies ecom prospects."""
+    """Discovers, researches, and qualifies ecom prospects.
+    Optimized: max 3 Apify calls instead of 24."""
     logger.info(f"=== PROSPECT PIPELINE START {'(RETRY)' if is_retry else ''} ===")
+
+    # Reset apify status for this run
+    apify_status["credits_exhausted"] = False
+    apify_status["last_error"] = ""
 
     profiles = {}
 
-    # Phase 1: Discover via similar accounts to seeds
+    # PHASE 1: Single Apify call — scrape all seeds at once, get profiles + related
+    seeds_batch = random.sample(ECOM_SEEDS, min(5, len(ECOM_SEEDS)))
     items = apify_run("apify~instagram-profile-scraper",
-                      {"usernames": ECOM_SEEDS[:6], "resultsLimit": 50})
+                      {"usernames": seeds_batch, "resultsLimit": 30})
+
+    if not items and apify_status["last_error"]:
+        logger.error(f"Phase 1 failed: {apify_status['last_error']}")
+
     for p in items:
         u = p.get("username", "")
         if u:
@@ -632,36 +665,26 @@ async def run_prospect_pipeline(context, is_retry=False):
                     "followers": rel.get("followersCount", 0), "source": "similar",
                 }
 
-    # Phase 2: Discover via hashtags (sample 6)
-    sampled_tags = random.sample(ECOM_HASHTAGS, min(6, len(ECOM_HASHTAGS)))
-    for tag in sampled_tags:
-        items = apify_run("apify~instagram-hashtag-scraper",
-                          {"hashtags": [tag], "resultsLimit": 15, "resultsType": "posts"})
-        for item in items:
-            owner = item.get("ownerUsername") or item.get("owner", {}).get("username", "")
-            if owner and owner not in profiles:
-                profiles[owner] = {"username": owner, "source_hashtag": tag}
+    logger.info(f"Phase 1: {len(profiles)} profiles from seeds")
 
-    logger.info(f"Phase 1-2: Discovered {len(profiles)} raw profiles")
+    # PHASE 2: Single Apify call — get details for profiles that need them (batch)
+    need_details = [u for u, p in profiles.items() if not p.get("bio") and p.get("followers", 0) >= 1000]
+    if need_details and not apify_status["credits_exhausted"]:
+        batch = need_details[:20]
+        detail_items = apify_run("apify~instagram-profile-scraper",
+                                 {"usernames": batch})
+        for p in detail_items:
+            u = p.get("username", "")
+            if u in profiles:
+                profiles[u].update({
+                    "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
+                    "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
+                    "website": p.get("externalUrl", ""),
+                    "is_business": p.get("isBusinessAccount", False),
+                })
+        logger.info(f"Phase 2: got details for {len(detail_items)} profiles")
 
-    # Phase 3: Get full details for profiles missing data
-    need_details = [u for u, p in profiles.items() if not p.get("bio")]
-    if need_details:
-        for batch_start in range(0, min(len(need_details), 40), 20):
-            batch = need_details[batch_start:batch_start + 20]
-            detail_items = apify_run("apify~instagram-profile-scraper",
-                                     {"usernames": batch})
-            for p in detail_items:
-                u = p.get("username", "")
-                if u in profiles:
-                    profiles[u].update({
-                        "full_name": p.get("fullName", ""), "bio": p.get("biography", ""),
-                        "followers": p.get("followersCount", 0), "posts": p.get("postsCount", 0),
-                        "website": p.get("externalUrl", ""),
-                        "is_business": p.get("isBusinessAccount", False),
-                    })
-
-    # Phase 4: Hard filter — remove obvious non-fits before AI research
+    # PHASE 3: Hard filter — no Apify needed
     pre_qualified = []
     for p in profiles.values():
         followers = p.get("followers", 0)
@@ -675,7 +698,6 @@ async def run_prospect_pipeline(context, is_retry=False):
         has_signal = any(s in bio for s in BRAND_SIGNALS) or bool(p.get("website"))
         if not has_signal:
             continue
-        # Extract owner IG from bio
         mentions = re.findall(r'@([a-zA-Z0-9_.]+)', p.get("bio") or "")
         skip = ["shop", "store", "brand", "official", "wear", "linktree", p.get("username", "").lower()]
         owner_ig = ""
@@ -686,27 +708,12 @@ async def run_prospect_pipeline(context, is_retry=False):
         p["owner_ig"] = owner_ig
         pre_qualified.append(p)
 
-    logger.info(f"Phase 4: {len(pre_qualified)} passed hard filters")
+    logger.info(f"Phase 3: {len(pre_qualified)} passed hard filters")
 
-    # Phase 5: Get recent posts for engagement data (top 15 candidates by follower sweet spot)
+    # PHASE 4: Website analysis + AI research (no Apify — just HTTP + Claude)
     pre_qualified.sort(key=lambda x: abs(x.get("followers", 0) - 8000))
-    candidates = pre_qualified[:15]
+    candidates = pre_qualified[:10]
 
-    for p in candidates:
-        try:
-            post_items = apify_run("apify~instagram-post-scraper",
-                                   {"directUrls": [f"https://www.instagram.com/{p['username']}/"],
-                                    "resultsLimit": 6})
-            if post_items:
-                likes = [item.get("likesCount", 0) for item in post_items if item.get("likesCount")]
-                p["avg_engagement"] = sum(likes) // len(likes) if likes else 0
-                captions = [item.get("caption", "")[:100] for item in post_items[:3] if item.get("caption")]
-                p["recent_captions"] = " | ".join(captions)
-        except Exception as e:
-            logger.error(f"Post scrape error @{p.get('username','')}: {e}")
-
-    # Phase 6: AI deep research on top candidates
-    logger.info(f"Phase 6: AI researching {len(candidates)} candidates...")
     researched = []
     for p in candidates:
         website_signals = scrape_website_brief(p.get("website", ""))
@@ -724,7 +731,6 @@ async def run_prospect_pipeline(context, is_retry=False):
     top = researched[:8]
 
     if top:
-        # Cache today's prospects as backup for tomorrow
         context.bot_data["cached_prospects"] = top
         context.bot_data["cached_total"] = len(researched)
         context.bot_data["cached_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -733,13 +739,15 @@ async def run_prospect_pipeline(context, is_retry=False):
     context.bot_data["pipeline_date"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     context.bot_data["total_found"] = len(researched)
 
-    # If pipeline found nothing and this isn't already a retry, schedule retry in 1 hour
+    # Handle failures
     if not top and not is_retry:
-        logger.info("Pipeline found no prospects — scheduling retry in 1 hour")
+        error_detail = apify_status["last_error"] or "No qualified brands found"
+        logger.info(f"Pipeline empty — scheduling retry. Reason: {error_detail}")
         try:
             await context.bot.send_message(
                 chat_id=LUKE_CHAT_ID_FIXED,
-                text="⚠️ 5 AM pipeline came up empty (possible Apify rate limit). Auto-retrying in 1 hour. You can also run /prospects manually anytime."
+                text=f"⚠️ Pipeline came up empty.\nReason: {error_detail}\n\n"
+                     f"Auto-retrying in 1 hour. You can also run /prospects manually."
             )
         except Exception:
             pass
@@ -748,20 +756,19 @@ async def run_prospect_pipeline(context, is_retry=False):
             when=3600, name="prospect_retry",
         )
     elif not top and is_retry:
-        logger.info("Retry also found nothing")
+        error_detail = apify_status["last_error"] or "Still no results"
         try:
             await context.bot.send_message(
                 chat_id=LUKE_CHAT_ID_FIXED,
-                text="⚠️ Pipeline retry also came up empty. Run /prospects later when you get a chance — Apify might need a cooldown."
+                text=f"⚠️ Retry also empty.\nReason: {error_detail}\n\nRun /prospects later."
             )
         except Exception:
             pass
 
-    logger.info(f"=== PIPELINE COMPLETE: {len(researched)} researched & qualified, {len(top)} top picks ===")
+    logger.info(f"=== PIPELINE DONE: {len(profiles)} scraped → {len(pre_qualified)} filtered → {len(researched)} researched → {len(top)} top ===")
 
 
 async def send_morning_digest(context):
-    """Runs at 7:30 AM EST — sends prospect digest to Luke."""
     logger.info("=== SENDING MORNING DIGEST ===")
     bot = context.bot
 
@@ -770,7 +777,6 @@ async def send_morning_digest(context):
     today = datetime.now(EST).strftime("%A, %B %d")
     using_cache = False
 
-    # Fallback to yesterday's cached prospects if today's pipeline failed
     if not prospects and context.bot_data.get("cached_prospects"):
         prospects = context.bot_data["cached_prospects"]
         total_found = context.bot_data.get("cached_total", 0)
@@ -787,6 +793,7 @@ async def send_morning_digest(context):
         ]
         day = datetime.now(EST).strftime("%A")
         msg = f"{random.choice(greetings)}\n\n{random.choice(motivations)}\n\nWhat's your ONE thing today ({day})?\n\nPhone away for the first 30 mins. No exceptions."
+        msg += "\n\n💡 Run /prospects anytime to get fresh leads on demand."
         await bot.send_message(chat_id=LUKE_CHAT_ID_FIXED, text=msg)
         return
 
@@ -802,10 +809,9 @@ async def send_morning_digest(context):
         cached_date = context.bot_data.get("cached_date", "yesterday")
         lines.append(f"⚠️ Today's pipeline failed — showing {cached_date} prospects. Run /prospects for fresh ones.")
     lines.append(f"━━━━━━━━━━━━━━━━━━━━━")
-    lines.append(f"🟢 Elite: {elite} | 🟡 Good: {good} | Total scraped: {total_found}")
+    lines.append(f"🟢 Elite: {elite} | 🟡 Good: {good} | Total: {total_found}")
     lines.append("")
 
-    # AI summary
     try:
         summaries = [f"@{p['username']} ({p.get('followers',0):,} followers, score {p.get('outreach_score',0)}, website: {p.get('website','none')})" for p in prospects[:5]]
         ai = client.messages.create(
@@ -885,82 +891,23 @@ def main():
         name="morning_digest",
     )
 
-    # FORMAT TEST: show Luke what the morning digest looks like using a sample prospect
-    async def test_format_preview(context):
-        logger.info("=== FORMAT PREVIEW TEST ===")
-        sample = {
-            "username": "samplestreetwear",
-            "full_name": "Sample Streetwear Co.",
-            "bio": "Handcrafted streetwear from Brooklyn 🗽 Shop our latest drop ⬇️ @founderhandle",
-            "followers": 8200,
-            "posts": 147,
-            "website": "samplestreetwear.com",
-            "owner_ig": "founderhandle",
-            "avg_engagement": 340,
-            "website_signals": "Shopify store | NO Meta Pixel detected | Uses Klaviyo (email) | Price range: $35-$120",
-        }
-        analysis = ai_research_prospect(sample, sample["website_signals"])
-        if not analysis:
-            analysis = {
-                "niche": "streetwear", "quality_score": 82,
-                "what_they_sell": "Handcrafted streetwear — hoodies, tees, and accessories with Brooklyn-inspired graphics",
-                "strengths": "Strong brand identity, engaged community, consistent posting with quality product shots",
-                "weaknesses": "No Meta Pixel means zero retargeting. Running Klaviyo but likely no paid traffic feeding it. Leaving money on the table.",
-                "ad_opportunity": "Install pixel, launch retargeting + lookalike campaigns on Meta. Their organic is solid — paid would scale them fast.",
-                "dm_ice_breaker": "Your latest drop is fire — the hoodie colorways are next level. Brooklyn roots show in every piece.",
-                "dm_pitch": "I run a small ad agency and noticed you don't have a Meta Pixel set up yet. I'd love to run your ads free for 30 days — retargeting alone would probably 2x your site traffic. No risk, just results.",
-            }
-
-        a = analysis
-        score = a.get("quality_score", 82)
-        badge = "🟢" if score >= 70 else "🟡" if score >= 50 else "🟠"
-        niche = a.get("niche", "streetwear").upper()
-
-        lines = [
-            "🧪 FORMAT PREVIEW — this is what your 7:30 AM digest will look like",
-            "(using a sample prospect since Apify is rate-limited from testing)",
-            "━━━━━━━━━━━━━━━━━━━━━",
-            "",
-            f"{badge} @{sample['username']} [{niche}] — {score}/100",
-            f"👥 {sample['followers']:,} followers | {sample['posts']} posts",
-            f"📈 ~{sample['avg_engagement']:,} avg likes/post",
-        ]
-        if a.get("what_they_sell"):
-            lines.append(f"🛍️ {a['what_they_sell']}")
-        lines.append(f"🌐 {sample['website']}")
-        lines.append(f"🔧 {sample['website_signals']}")
-        lines.append("")
-        if a.get("strengths"):
-            lines.append(f"✅ Strengths: {a['strengths']}")
-        if a.get("weaknesses"):
-            lines.append(f"⚠️ Weaknesses: {a['weaknesses']}")
-        if a.get("ad_opportunity"):
-            lines.append(f"🎯 Opportunity: {a['ad_opportunity']}")
-        lines.append("")
-        lines.append(f"👤 DM the owner → @{sample['owner_ig']}")
-        if a.get("dm_ice_breaker"):
-            lines.append(f"✉️ Ice Breaker:")
-            lines.append(f"\"{a['dm_ice_breaker']}\"")
-        if a.get("dm_pitch"):
-            lines.append("")
-            lines.append(f"📨 Pitch (after they reply):")
-            lines.append(f"\"{a['dm_pitch']}\"")
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━━")
-        lines.append("✅ Tomorrow at 7:30 AM you'll get 5-8 REAL prospects like this.")
-        lines.append("Pipeline runs at 5 AM, digest hits at 7:30. All cloud — laptop off is fine.")
-
+    # Startup confirmation — no Apify calls, just confirms bot is live
+    async def send_startup_msg(context):
         await context.bot.send_message(
             chat_id=LUKE_CHAT_ID_FIXED,
-            text="\n".join(lines)
+            text="🟢 Jose is live on Railway!\n\n"
+                 "Scheduled:\n"
+                 "• 5:00 AM — Prospect pipeline\n"
+                 "• 7:30 AM — Morning digest\n\n"
+                 "Commands:\n"
+                 "• /prospects — run pipeline NOW\n"
+                 "• \"reached out to @handle\" — track outreach\n\n"
+                 "All times EST. Laptop doesn't need to be on."
         )
-        logger.info("=== FORMAT PREVIEW SENT ===")
-
-    app.job_queue.run_once(test_format_preview, when=30, name="format_preview")
+    app.job_queue.run_once(send_startup_msg, when=10, name="startup_msg")
 
     logger.info("Jose Telegram bot is live!")
     logger.info("Scheduled: prospect pipeline at 5:00 AM EST, morning digest at 7:30 AM EST")
-    logger.info("Test message will send in 90 seconds")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
