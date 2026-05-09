@@ -561,3 +561,10 @@
 [TASK] Fix `/prospects` command - diagnose error/timeout/empty results
 [TASK] Determine when `/prospects` command last worked successfully
 [TASK] Clarify what Luke needs from `/prospects` - today's digest, specific list, or other output
+
+### 2026-05-09 23:49 UTC
+[PERSONAL] Luke has a call tomorrow with someone new ("that kid")
+[FACT] Khari gave feedback on AI usage — wants more natural/authentic feel for brand image
+[IDEA] Luke considering more organic approach depending on the creative direction
+[TASK] Luke needs to acknowledge Khari's feedback, pull real product photos from Country Side Staples' Instagram, build one new organic ad with minimal copy, send it by [specific day]
+[GOAL] Close deal with Khari by end of week before momentum dies
