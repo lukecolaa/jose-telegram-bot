@@ -568,3 +568,10 @@
 [IDEA] Luke considering more organic approach depending on the creative direction
 [TASK] Luke needs to acknowledge Khari's feedback, pull real product photos from Country Side Staples' Instagram, build one new organic ad with minimal copy, send it by [specific day]
 [GOAL] Close deal with Khari by end of week before momentum dies
+
+### 2026-05-09 23:49 UTC
+[FACT] Prospect is still in play, not closed yet, gave feedback instead of ghosting
+[TASK] Pull prospect's real product photos today
+[TASK] Build one clean organic ad by tomorrow or next day
+[TASK] Send updated ad to prospect with message "Updated version — let me know what you think"
+[DECISION] If prospect responds positively to new ad, ask for the deal; if ghosts after new ad, prospect is out
